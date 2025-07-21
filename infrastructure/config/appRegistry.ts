@@ -12,6 +12,7 @@ import Bookmark from "@/app/(bookmark)/Bookmark";
 import { SettingsPanel } from "@/app/(settings)/SettingsPanel";
 import SessionLogApp from "@/app/(session-log)/SessionLogApp";
 import Announcements from "@/app/(announcements)/Announcements";
+import Kudos from "@/app/(kudos)/Kudos";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -123,6 +124,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 550, height: 650 },
     minSize: { width: 400, height: 450 },
     component: Announcements,
+  },
+  kudos: {
+    name: "Team Kudos",
+    src: "/icons/kudos.png",
+    defaultSize: { width: 600, height: 700 },
+    minSize: { width: 450, height: 500 },
+    component: Kudos,
   },
 };
 
