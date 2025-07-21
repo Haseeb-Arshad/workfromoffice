@@ -4,6 +4,13 @@ import { CSS } from "@dnd-kit/utilities";
 import { TaskItem } from "@/application/atoms/todoListAtom";
 import { useState, useRef, useEffect } from "react";
 import { playSound } from "@/infrastructure/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/presentation/components/ui/select";
 type TaskItemProps = {
   task: TaskItem;
   sessionCount: number;
@@ -106,17 +113,27 @@ export const SortableTaskItem = ({
             )}
           </div>
           <div className="flex items-center justify-end gap-1">
-            <select
+            <Select
               value={task.category}
-              onChange={(e) =>
-                onMove(task.id, e.target.value as TaskItem["category"])
+              onValueChange={(value) =>
+                onMove(task.id, value as TaskItem["category"])
               }
-              className="text-xs bg-transparent border rounded"
             >
-              <option value="todo">To Do</option>
-              <option value="inProgress">In Progress</option>
-              <option value="done">Done</option>
-            </select>
+              <SelectTrigger className="w-[100px] h-8 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todo" className="text-xs">
+                  To Do
+                </SelectItem>
+                <SelectItem value="inProgress" className="text-xs">
+                  In Progress
+                </SelectItem>
+                <SelectItem value="done" className="text-xs">
+                  Done
+                </SelectItem>
+              </SelectContent>
+            </Select>
             <button onClick={handleEdit}>
               <div className="relative hover:bg-blue-200 p-1 rounded">
                 <Pencil className="size-4" />

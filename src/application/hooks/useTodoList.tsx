@@ -28,12 +28,57 @@ export function useTodoList() {
   const handleAddTask = () => {
     if (newTask.trim() !== "") {
       playSound("/sounds/click.mp3");
+      
+      // Sample data for demonstration
+      const samplePriorities = ["low", "medium", "high"] as const;
+      const sampleProjects = ["project-phoenix", "q3-marketing", "research", "development", "general"] as const;
+      const sampleAssignees = [
+        { name: "Sarah Chen", avatar: "/avatars/sarah.jpg" },
+        { name: "Mike Rodriguez", avatar: "/avatars/mike.jpg" },
+        { name: "Alex Kim", avatar: "/avatars/alex.jpg" },
+        null,
+      ];
+      
+      const randomPriority = samplePriorities[Math.floor(Math.random() * samplePriorities.length)];
+      const randomProject = sampleProjects[Math.floor(Math.random() * sampleProjects.length)];
+      const randomAssignee = sampleAssignees[Math.floor(Math.random() * sampleAssignees.length)];
+      
+      // Generate random due date (within next 14 days)
+      const randomDueDate = Math.random() > 0.5 ? 
+        new Date(Date.now() + Math.random() * 14 * 24 * 60 * 60 * 1000).toISOString() : 
+        undefined;
+      
+      // Generate sample sub-tasks
+      const sampleSubTasks = Math.random() > 0.7 ? [
+        {
+          id: crypto.randomUUID(),
+          content: "Research requirements",
+          completed: Math.random() > 0.5,
+        },
+        {
+          id: crypto.randomUUID(),
+          content: "Create mockups",
+          completed: Math.random() > 0.5,
+        },
+        {
+          id: crypto.randomUUID(),
+          content: "Get approval",
+          completed: false,
+        },
+      ] : [];
+      
       setTasks((currentTasks) => [
         ...currentTasks,
         {
           id: crypto.randomUUID(),
           content: newTask.trim(),
           category: "todo" as const,
+          priority: randomPriority,
+          project: randomProject,
+          dueDate: randomDueDate,
+          assignee: randomAssignee,
+          subTasks: sampleSubTasks,
+          isSynced: Math.random() > 0.7,
         },
       ]);
       setNewTask("");

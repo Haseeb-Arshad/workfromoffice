@@ -7,10 +7,28 @@ import {
 const FEATURE_KEY = "todoList";
 
 // Define task item type
+export type TaskPriority = "low" | "medium" | "high";
+export type TaskProject = "project-phoenix" | "q3-marketing" | "research" | "development" | "general";
+
+export type SubTask = {
+  id: string;
+  content: string;
+  completed: boolean;
+};
+
 export type TaskItem = {
   id: string;
   content: string;
   category: "todo" | "inProgress" | "done";
+  priority: TaskPriority;
+  project: TaskProject;
+  dueDate?: string; // ISO date string
+  assignee?: {
+    name: string;
+    avatar: string;
+  };
+  subTasks: SubTask[];
+  isSynced?: boolean; // For calendar sync indicator
 };
 
 // Define the shape of the state

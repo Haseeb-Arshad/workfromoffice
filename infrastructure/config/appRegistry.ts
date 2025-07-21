@@ -11,6 +11,7 @@ import { ChangelogWindow } from "@/presentation/components/shared/taskbar/Change
 import Bookmark from "@/app/(bookmark)/Bookmark";
 import { SettingsPanel } from "@/app/(settings)/SettingsPanel";
 import SessionLogApp from "@/app/(session-log)/SessionLogApp";
+import Announcements from "@/app/(announcements)/Announcements";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -115,6 +116,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     minSize: { width: 450, height: 300 },
     component: SessionLogApp,
     hidden: true,
+  },
+  announcements: {
+    name: "Announcements",
+    src: "/icons/announcements.png",
+    defaultSize: { width: 550, height: 650 },
+    minSize: { width: 400, height: 450 },
+    component: Announcements,
   },
 };
 
