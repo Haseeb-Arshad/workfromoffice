@@ -49,13 +49,18 @@ export const Window = () => {
 
   if (!isMounted) return null;
 
-  // Create portal container if it doesn't exist
+  // Create portal container only if it doesn't exist
   let portalContainer = document.getElementById("window-portal-container");
   if (!portalContainer && typeof document !== "undefined") {
     portalContainer = document.createElement("div");
     portalContainer.id = "window-portal-container";
     portalContainer.className = "fixed inset-0 z-[100]";
     portalContainer.style.pointerEvents = "none";
+    portalContainer.style.position = "fixed";
+    portalContainer.style.top = "0";
+    portalContainer.style.left = "0";
+    portalContainer.style.width = "100%";
+    portalContainer.style.height = "100%";
     portalContainer.setAttribute("aria-hidden", "true");
     document.body.appendChild(portalContainer);
   }

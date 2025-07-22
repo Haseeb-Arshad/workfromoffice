@@ -15,7 +15,7 @@ export default function Page() {
           <DesktopIcons />
         </div>
       </div>
-      <AdsPopup />
+      {/* <AdsPopup /> */}
     </div>
   );
 }

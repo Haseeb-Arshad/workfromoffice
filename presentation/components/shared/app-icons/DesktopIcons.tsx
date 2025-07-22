@@ -52,7 +52,9 @@ export const DesktopIcons = () => {
       ></div>
 
       {/* Desktop Icons */}
-      <div className="absolute top-4 right-4 flex flex-col flex-wrap-reverse gap-2 z-10 max-h-[calc(100vh-80px)]">
+      <div 
+        className="absolute top-4 right-4 flex flex-col flex-wrap-reverse gap-2 z-10 max-h-[calc(100vh-80px)]"
+      >
         {apps.map((app) => (
           <div
             key={app.id}
