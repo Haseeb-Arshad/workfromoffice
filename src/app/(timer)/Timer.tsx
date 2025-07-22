@@ -90,7 +90,7 @@ export const Timer = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start text-secondary h-full p-4">
+    <div className="flex flex-col items-center justify-start text-secondary h-full p-6 bg-gradient-to-br from-purple-50 via-violet-50/30 to-indigo-50/20">
       {/* Timer worker manager (invisible) */}
       <TimerManager />
 

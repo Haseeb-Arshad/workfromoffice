@@ -17,7 +17,7 @@ const Announcements = () => {
   );
 
   return (
-    <div className="flex flex-col h-full bg-stone-50 p-4">
+    <div className="flex flex-col h-full bg-gradient-to-br from-yellow-50 via-orange-50/30 to-red-50/20 p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-primary">What's New</h1>

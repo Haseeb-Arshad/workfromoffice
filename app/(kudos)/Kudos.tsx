@@ -130,3 +130,4 @@ const Kudos = () => {
 };
 
 export default Kudos;
+export { Kudos };
