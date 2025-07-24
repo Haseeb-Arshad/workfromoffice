@@ -59,7 +59,7 @@ export const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
     onClose();
   };
 
-  const handleChange = (field: string, value: any) => {
+  const handleChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 

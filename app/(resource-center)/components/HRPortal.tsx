@@ -162,7 +162,7 @@ export const HRPortal = () => {
                   Recent Activities
                 </h3>
                 <div className="space-y-4">
-                  {activities.slice(0, 4).map((activity, index) => (
+                  {activities.slice(0, 4).map((activity) => (
                     <div key={activity.id} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                         <Users className="h-4 w-4 text-blue-600" />

@@ -34,6 +34,9 @@ export function useTodoList() {
           id: crypto.randomUUID(),
           content: newTask.trim(),
           category: "todo" as const,
+          priority: "medium" as const,
+          project: "general" as const,
+          subTasks: [],
         },
       ]);
       setNewTask("");

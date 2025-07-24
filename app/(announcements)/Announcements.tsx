@@ -20,7 +20,7 @@ const Announcements = () => {
     <div className="flex flex-col h-full bg-gradient-to-br from-yellow-50 via-orange-50/30 to-red-50/20 p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-primary">What's New</h1>
+        <h1 className="text-2xl font-bold text-primary">What&apos;s New</h1>
         <button
           onClick={() => setShowForm(!showForm)}
           className="bg-secondary hover:bg-accent text-white px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors"
@@ -61,7 +61,7 @@ const Announcements = () => {
                 No Announcements Yet
               </h3>
               <p className="text-muted-foreground">
-                Company announcements will appear here when they're posted.
+                Company announcements will appear here when they&apos;re posted.
               </p>
             </div>
           </div>

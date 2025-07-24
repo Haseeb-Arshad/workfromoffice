@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAtom } from "jotai";
-import { addKudosAtom, teamMembersAtom, TeamMember } from "@/application/atoms/kudosAtom";
+import { addKudosAtom, teamMembersAtom } from "@/application/atoms/kudosAtom";
 import { X, Heart, Send } from "lucide-react";
 import {
   Select,
@@ -152,7 +152,7 @@ export const KudosForm: React.FC<KudosFormProps> = ({ onClose }) => {
 
             <div className="space-y-3">
               <label className="block text-sm font-bold text-primary">
-                👋 Who's giving the kudos? *
+              👋 Who&apos;s giving the kudos? *
               </label>
               <Select
                 value={selectedGiver}

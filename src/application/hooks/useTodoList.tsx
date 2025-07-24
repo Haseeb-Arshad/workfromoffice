@@ -36,7 +36,7 @@ export function useTodoList() {
         { name: "Sarah Chen", avatar: "/avatars/sarah.jpg" },
         { name: "Mike Rodriguez", avatar: "/avatars/mike.jpg" },
         { name: "Alex Kim", avatar: "/avatars/alex.jpg" },
-        null,
+        undefined,
       ];
       
       const randomPriority = samplePriorities[Math.floor(Math.random() * samplePriorities.length)];

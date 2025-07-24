@@ -134,7 +134,7 @@ export const ITHelpdesk = () => {
     }
   };
 
-  const handleCommonIssueClick = (issue: any) => {
+  const handleCommonIssueClick = (issue: { title: string; description: string; category: string }) => {
     setNewTicket({ 
       subject: issue.title, 
       description: issue.description, 
