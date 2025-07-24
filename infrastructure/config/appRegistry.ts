@@ -140,14 +140,14 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   },
   schedule: {
     name: "My Day",
-    src: "/icons/calendar.png",
+    src: "/icons/myday.png",
     defaultSize: { width: 480, height: 600 },
     minSize: { width: 400, height: 500 },
     component: Schedule,
   },
   resourceCenter: {
     name: "Resources",
-    src: "/icons/resource-center.png",
+    src: "/icons/book.png",
     defaultSize: { width: 800, height: 700 },
     minSize: { width: 600, height: 500 },
     component: ResourceCenter,

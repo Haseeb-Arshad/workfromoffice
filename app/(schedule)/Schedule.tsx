@@ -10,6 +10,7 @@ import { Plus, Calendar, Clock } from "lucide-react";
 const Schedule = () => {
   const [events] = useAtom(eventsAtom);
   const [showForm, setShowForm] = useState(false);
+  const [isFormAnimating, setIsFormAnimating] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
 
   // Update current time every minute
@@ -91,8 +92,20 @@ const Schedule = () => {
         </div>
         
         <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white px-6 py-3 rounded-xl flex items-center gap-3 text-sm font-bold transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm relative overflow-hidden group"
+          onClick={() => {
+            if (!showForm && !isFormAnimating) {
+              setIsFormAnimating(true);
+              // Small delay to prevent flicker
+              setTimeout(() => {
+                setShowForm(true);
+                setIsFormAnimating(false);
+              }, 50);
+            } else if (showForm) {
+              setShowForm(false);
+            }
+          }}
+          disabled={isFormAnimating}
+          className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white px-6 py-3 rounded-xl flex items-center gap-3 text-sm font-bold transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
           <Plus className="size-5" />
@@ -102,9 +115,10 @@ const Schedule = () => {
 
       {/* Add Event Form */}
       {showForm && (
-        <div className="mb-8 animate-in slide-in-from-top-4 duration-300">
-          <EventForm onClose={() => setShowForm(false)} />
-        </div>
+        <EventForm onClose={() => {
+          setShowForm(false);
+          setIsFormAnimating(false);
+        }} />
       )}
 
       {/* Daily Overview */}

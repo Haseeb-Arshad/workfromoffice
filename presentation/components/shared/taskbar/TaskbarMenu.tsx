@@ -125,24 +125,24 @@ export const TaskbarMenu = () => {
         </MenubarTrigger>
         <MenubarContent>
           <MenubarItem disabled>
-            WFC OS<MenubarShortcut>v 2.3.1</MenubarShortcut>
+            WFO OS<MenubarShortcut>v 2.3.1</MenubarShortcut>
           </MenubarItem>
           <MenubarItem inset onSelect={openChangelogWindow}>
             Changelog<MenubarShortcut>history</MenubarShortcut>
           </MenubarItem>
           <MenubarItem
             inset
-            onSelect={() => openUrl("https://github.com/ekmigasari/wfcOS.git")}
+            onSelect={() => openUrl("https://github.com/Haseeb-Arshad/workfromoffice.git")}
           >
             Github<MenubarShortcut>repository</MenubarShortcut>
           </MenubarItem>
           <MenubarSeparator />
-          <MenubarItem
+          {/* <MenubarItem
             inset
             onSelect={() => openUrl("https://x.com/ekmigasari")}
           >
             Xmigas <MenubarShortcut>creator</MenubarShortcut>
-          </MenubarItem>
+          </MenubarItem> */}
         </MenubarContent>
       </MenubarMenu>
 

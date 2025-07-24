@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Plus, X, Calendar, Clock, MapPin, Users, Repeat, AlertCircle } from "lucide-react";
 import { useAtom } from "jotai";
 import { addEventAtom, ScheduleEvent, EventType, MeetingType, Priority } from "@/application/atoms/scheduleAtom";
@@ -9,6 +10,7 @@ interface EventFormProps {
 
 export const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
   const [, addEvent] = useAtom(addEventAtom);
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -21,6 +23,16 @@ export const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
     priority: "medium" as Priority,
     isRecurring: false
   });
+
+  useEffect(() => {
+    setMounted(true);
+    // Prevent body scroll when modal is open
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,9 +84,9 @@ export const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
     return emojis[priority];
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-white/95 to-blue-50/90 backdrop-blur-lg rounded-3xl border-2 border-white/30 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+  const modalContent = (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9998] p-4 animate-in fade-in-0 duration-200">
+      <div className="bg-gradient-to-br from-white/95 to-blue-50/90 backdrop-blur-lg rounded-3xl border-2 border-white/30 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
         {/* Header */}
         <div className="relative p-6 border-b border-white/20">
           <div className="flex items-center gap-3">
@@ -290,4 +302,10 @@ export const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
       </div>
     </div>
   );
+
+  if (!mounted) {
+    return null;
+  }
+
+  return createPortal(modalContent, document.body);
 };
