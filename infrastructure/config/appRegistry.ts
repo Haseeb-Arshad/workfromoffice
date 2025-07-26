@@ -20,6 +20,7 @@ import { ITHelpdesk } from "@/app/(resource-center)/components/ITHelpdesk";
 import { CompanyWiki } from "@/app/(resource-center)/components/CompanyWiki";
 import { DesignSystem } from "@/app/(resource-center)/components/DesignSystem";
 import Teahouse from "@/app/(teahouse)/Teahouse";
+import VillageWell from "@/app/(village-well)/VillageWell";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -188,9 +189,16 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   teahouse: {
     name: "The Teahouse",
     src: "/icons/coffee.png",
-    defaultSize: { width: 800, height: 600 },
-    minSize: { width: 600, height: 400 },
+    defaultSize: { width: 800, height: 700 },
+    minSize: { width: 700, height: 600 },
     component: Teahouse,
+  },
+  villageWell: {
+    name: "The Village Well",
+    src: "/icons/cafe.png",
+    defaultSize: { width: 900, height: 750 },
+    minSize: { width: 800, height: 650 },
+    component: VillageWell,
   },
 };
 

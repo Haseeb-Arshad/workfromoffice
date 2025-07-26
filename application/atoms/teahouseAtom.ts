@@ -41,7 +41,7 @@ export interface TeahouseState {
   channels: Channel[];
   messages: Message[];
   selectedContact: string | null;
-  selectedChannel: string;
+  selectedChannel: string | null;
   isTyping: { [userId: string]: boolean };
   onlineUsers: string[];
 }
@@ -94,6 +94,7 @@ const initialState: TeahouseState = {
     },
   ],
   messages: [
+    // Channel messages
     {
       id: '1',
       userId: '1',
@@ -138,6 +139,57 @@ const initialState: TeahouseState = {
       timestamp: new Date(Date.now() - 1200000),
       reactions: [{ emoji: '🌺', users: ['2', '4'] }],
       channelId: 'design-team'
+    },
+    // Direct messages
+    {
+      id: 'dm1',
+      userId: '1',
+      userName: 'Mei Kusakabe',
+      content: 'Hey! How are you doing today? 😊',
+      timestamp: new Date(Date.now() - 2400000),
+      reactions: [],
+      isDirectMessage: true,
+      recipientId: 'current-user'
+    },
+    {
+      id: 'dm2',
+      userId: 'current-user',
+      userName: 'You',
+      content: 'Hi Mei! I\'m doing great, thanks for asking!',
+      timestamp: new Date(Date.now() - 2340000),
+      reactions: [],
+      isDirectMessage: true,
+      recipientId: '1'
+    },
+    {
+      id: 'dm3',
+      userId: '2',
+      userName: 'Totoro',
+      content: 'Would you like to go for a forest walk later? 🌲',
+      timestamp: new Date(Date.now() - 1500000),
+      reactions: [],
+      isDirectMessage: true,
+      recipientId: 'current-user'
+    },
+    {
+      id: 'dm4',
+      userId: '3',
+      userName: 'Chihiro',
+      content: 'I need your feedback on the new design mockups when you have a moment!',
+      timestamp: new Date(Date.now() - 600000),
+      reactions: [],
+      isDirectMessage: true,
+      recipientId: 'current-user'
+    },
+    {
+      id: 'dm5',
+      userId: 'current-user',
+      userName: 'You',
+      content: 'Sure, I\'ll take a look at them right after this meeting!',
+      timestamp: new Date(Date.now() - 300000),
+      reactions: [],
+      isDirectMessage: true,
+      recipientId: '3'
     }
   ],
   selectedContact: null,
@@ -185,14 +237,14 @@ export const selectedContactAtom = atom(
     set(teahouseStateAtom, { 
       ...state, 
       selectedContact: contactId,
-      selectedChannel: contactId ? '' : state.selectedChannel
+      selectedChannel: contactId ? null : (state.selectedChannel || 'general')
     });
   }
 );
 
 export const selectedChannelAtom = atom(
   (get) => get(teahouseStateAtom).selectedChannel,
-  (get, set, channelId: string) => {
+  (get, set, channelId: string | null) => {
     const state = get(teahouseStateAtom);
     set(teahouseStateAtom, { 
       ...state, 

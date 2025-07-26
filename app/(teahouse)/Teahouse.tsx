@@ -65,6 +65,12 @@ const Teahouse: React.FC = () => {
     }
   };
 
+  // Add debug logging for state changes
+  useEffect(() => {
+    console.log('Selected contact changed:', selectedContact);
+    console.log('Selected channel changed:', selectedChannel);
+  }, [selectedContact, selectedChannel]);
+
   // Disable auto-scroll to prevent layout disruption
   // useEffect(() => {
   //   if (messages.length > 0) {
@@ -106,7 +112,9 @@ const Teahouse: React.FC = () => {
                           ? 'bg-amber-200 shadow-sm'
                           : 'hover:bg-amber-100'
                       }`}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        console.log('Selecting contact:', user.id, user.name);
                         setSelectedContact(user.id);
                         setSelectedChannel(null); // Clear channel selection when selecting contact
                       }}
@@ -154,7 +162,9 @@ const Teahouse: React.FC = () => {
                           ? 'bg-amber-200 shadow-sm'
                           : 'hover:bg-amber-100'
                       }`}
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
+                        console.log('Selecting channel:', channel.id, channel.name);
                         setSelectedChannel(channel.id);
                         setSelectedContact(null); // Clear contact selection when selecting channel
                       }}
@@ -181,84 +191,102 @@ const Teahouse: React.FC = () => {
       <div className="flex-1 flex flex-col">
         {/* Chat Header */}
         <div className="bg-gradient-to-r from-amber-100 to-yellow-100 p-4 border-b-2 border-amber-200">
-          <h2 className="text-lg font-semibold text-emerald-800 flex items-center gap-2">
-            {selectedContact ? (
-              <>
-                💬 {users.find(u => u.id === selectedContact)?.name}
-              </>
-            ) : (
-              <>
-                # {channels.find(c => c.id === selectedChannel)?.name}
-              </>
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-emerald-800 flex items-center gap-2">
+                {selectedContact ? (
+                  <>
+                    💬 {users.find(u => u.id === selectedContact)?.name}
+                  </>
+                ) : (
+                  <>
+                    # {channels.find(c => c.id === selectedChannel)?.name}
+                  </>
+                )}
+              </h2>
+              <p className="text-sm text-emerald-600 italic">
+                {selectedContact ? 'Direct message' : 'Team collaboration space'}
+              </p>
+            </div>
+            {selectedContact && (
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${
+                  users.find(u => u.id === selectedContact)?.status === 'available' ? 'bg-green-400' :
+                  users.find(u => u.id === selectedContact)?.status === 'busy' ? 'bg-red-400' :
+                  'bg-gray-400'
+                }`}></div>
+                <span className="text-sm text-emerald-600 capitalize">
+                  {users.find(u => u.id === selectedContact)?.status || 'offline'}
+                </span>
+              </div>
             )}
-          </h2>
-          <p className="text-sm text-emerald-600 italic">
-            {selectedContact ? 'Direct message' : 'Team collaboration space'}
-          </p>
+          </div>
         </div>
 
         {/* Messages */}
-        <ScrollArea className="flex-1 p-4">
-          <div className="space-y-4">
-            {messages.map(message => (
-              <div key={message.id} className="group">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-200 to-purple-200 flex items-center justify-center text-sm font-bold text-purple-700 shadow-md">
-                    {message.userName.charAt(0)}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <span className="font-semibold text-emerald-800">
-                        {message.userName}
-                      </span>
-                      <span className="text-xs text-emerald-600">
-                        {message.timestamp.toLocaleTimeString()}
-                      </span>
+        <div className="flex-1 overflow-hidden">
+          <ScrollArea className="h-full p-4">
+            <div className="space-y-4">
+              {messages.map(message => (
+                <div key={message.id} className="group">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-pink-200 to-purple-200 flex items-center justify-center text-sm font-bold text-purple-700 shadow-md">
+                      {message.userName.charAt(0)}
                     </div>
-                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-md border border-amber-200">
-                      <p className="text-emerald-900">{message.content}</p>
-                    </div>
-                    {/* Reactions */}
-                    {message.reactions.length > 0 && (
-                      <div className="flex gap-1 mt-2">
-                        {message.reactions.map((reaction, idx) => (
-                          <button
-                            key={idx}
-                            className="bg-amber-100 hover:bg-amber-200 rounded-full px-2 py-1 text-xs flex items-center gap-1 transition-colors duration-200"
-                            onClick={() => handleAddReaction(message.id, reaction.emoji)}
-                          >
-                            <span>{reaction.emoji}</span>
-                            <span className="text-emerald-700">
-                              {reaction.users.length}
-                            </span>
-                          </button>
-                        ))}
+                    <div className="flex-1">
+                      <div className="flex items-baseline gap-2 mb-1">
+                        <span className="font-semibold text-emerald-800">
+                          {message.userName}
+                        </span>
+                        <span className="text-xs text-emerald-600">
+                          {message.timestamp.toLocaleTimeString()}
+                        </span>
                       </div>
-                    )}
-                    {/* Quick reaction buttons (visible on hover) */}
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 mt-1">
-                      <div className="flex gap-1">
-                        {ghibliEmojis.slice(0, 4).map(emoji => (
-                          <button
-                            key={emoji}
-                            className="text-lg hover:scale-125 transition-transform duration-200 p-1"
-                            onClick={() => handleAddReaction(message.id, emoji)}
-                          >
-                            {emoji}
-                          </button>
-                        ))}
+                      <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-4 py-3 shadow-md border border-amber-200">
+                        <p className="text-emerald-900">{message.content}</p>
+                      </div>
+                      {/* Reactions */}
+                      {message.reactions.length > 0 && (
+                        <div className="flex gap-1 mt-2">
+                          {message.reactions.map((reaction, idx) => (
+                            <button
+                              key={idx}
+                              className="bg-amber-100 hover:bg-amber-200 rounded-full px-2 py-1 text-xs flex items-center gap-1 transition-colors duration-200"
+                              onClick={() => handleAddReaction(message.id, reaction.emoji)}
+                            >
+                              <span>{reaction.emoji}</span>
+                              <span className="text-emerald-700">
+                                {reaction.users.length}
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {/* Quick reaction buttons (visible on hover) */}
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 mt-1">
+                        <div className="flex gap-1">
+                          {ghibliEmojis.slice(0, 4).map(emoji => (
+                            <button
+                              key={emoji}
+                              className="text-lg hover:scale-125 transition-transform duration-200 p-1"
+                              onClick={() => handleAddReaction(message.id, emoji)}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollArea>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
+        </div>
 
-        {/* Message Input */}
-        <div className="bg-gradient-to-r from-amber-50 to-yellow-50 p-4 border-t-2 border-amber-200">
+        {/* Message Input - Always Visible */}
+        <div className="bg-gradient-to-r from-amber-50 to-yellow-50 p-4 border-t-2 border-amber-200 shrink-0">
           <div className="flex items-center gap-2">
             <div className="flex-1 relative">
               <Input
