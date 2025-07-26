@@ -19,6 +19,7 @@ import { HRPortal } from "@/app/(resource-center)/components/HRPortal";
 import { ITHelpdesk } from "@/app/(resource-center)/components/ITHelpdesk";
 import { CompanyWiki } from "@/app/(resource-center)/components/CompanyWiki";
 import { DesignSystem } from "@/app/(resource-center)/components/DesignSystem";
+import Teahouse from "@/app/(teahouse)/Teahouse";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -183,6 +184,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     minSize: { width: 600, height: 500 },
     component: DesignSystem,
     hidden: true,
+  },
+  teahouse: {
+    name: "The Teahouse",
+    src: "/icons/coffee.png",
+    defaultSize: { width: 800, height: 600 },
+    minSize: { width: 600, height: 400 },
+    component: Teahouse,
   },
 };
 
