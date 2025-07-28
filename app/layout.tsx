@@ -8,7 +8,7 @@ const font = Itim({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://workfromoffice.com"),
-  title: "Work from Office | Award-Winning app for Focus & Productivity",
+  title: "Work from Office",
   description:
     "Virtual office environment designed for deep focus and remote work productivity. All-in-one workspace with integrated to-do lists, timers, notepads, music, and ambience for distraction-free work.",
   openGraph: {

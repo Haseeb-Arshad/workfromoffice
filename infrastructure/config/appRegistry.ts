@@ -21,6 +21,7 @@ import { CompanyWiki } from "@/app/(resource-center)/components/CompanyWiki";
 import { DesignSystem } from "@/app/(resource-center)/components/DesignSystem";
 import Teahouse from "@/app/(teahouse)/Teahouse";
 import VillageWell from "@/app/(village-well)/VillageWell";
+import TravelersDirectory from "@/app/(travelers-directory)/TravelersDirectory";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -199,6 +200,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 900, height: 750 },
     minSize: { width: 800, height: 650 },
     component: VillageWell,
+  },
+  travelersDirectory: {
+    name: "The Fellowship",
+    src: "/icons/fellowship.png",
+    defaultSize: { width: 1000, height: 800 },
+    minSize: { width: 800, height: 600 },
+    component: TravelersDirectory,
   },
 };
 

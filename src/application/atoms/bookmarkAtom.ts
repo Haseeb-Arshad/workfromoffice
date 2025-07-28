@@ -19,11 +19,6 @@ export type BookmarkState = BookmarkItem[];
 
 // Load initial state from localStorage or use default (empty array)
 const initialBookmarks = loadFeatureState<BookmarkState>(FEATURE_KEY) ?? [
-  {
-    id: "default-feedback-bookmark",
-    name: "Give Feedback for WFC OS",
-    url: "https://workfromcoffee.featurebase.app/",
-  },
 ];
 
 // Create the base atom

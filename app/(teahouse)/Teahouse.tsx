@@ -50,7 +50,7 @@ const Teahouse: React.FC = () => {
         userName: currentUser.name,
         content: messageInput,
         reactions: [],
-        channelId: selectedContact ? undefined : selectedChannel,
+        channelId: selectedContact ? undefined : selectedChannel ?? undefined,
         isDirectMessage: !!selectedContact,
         recipientId: selectedContact || undefined,
       });

@@ -1,15 +1,14 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Heart, MessageCircle, Share2, Plus, Camera, Smile, TrendingUp, Users, Coffee, Star } from 'lucide-react';
+import React, { useState } from 'react';
+import { Heart, MessageCircle, Share2, Plus, Users } from 'lucide-react';
 import { ScrollArea } from '@/presentation/components/ui/scroll-area';
 import { Button } from '@/presentation/components/ui/button';
 import { Input } from '@/presentation/components/ui/input';
 import { Textarea } from '@/presentation/components/ui/textarea';
 import { Card, CardContent, CardHeader } from '@/presentation/components/ui/card';
 import { Badge } from '@/presentation/components/ui/badge';
-import { Separator } from '@/presentation/components/ui/separator';
-import { useAtomValue, useSetAtom, useAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import {
   villageWellPostsAtom,
   addVillageWellPostAtom,

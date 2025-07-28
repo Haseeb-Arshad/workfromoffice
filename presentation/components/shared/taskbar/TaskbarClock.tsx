@@ -3,7 +3,7 @@
 import { Coffee } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { SoundToggle } from "./SoundToggle";
-import { Button } from "../../ui/button";
+import { StatusDropdown } from "@/presentation/components/shared/StatusDropdown";
 
 export const TaskbarClock = () => {
   const [time, setTime] = useState<Date | null>(null);
@@ -22,20 +22,7 @@ export const TaskbarClock = () => {
     <div className="taskbar-clock ml-auto flex items-center gap-3">
       <div className="flex items-center space-x-1">
         <SoundToggle />
-        <a
-          href="https://ko-fi.com/workfromcoffee"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-7"
-            title="Buy me a coffee"
-          >
-            <Coffee size={16} />
-          </Button>
-        </a>
+        <StatusDropdown />
       </div>
       <div className="taskbar-clock ml-auto mr-2 text-sm font-medium whitespace-nowrap uppercase">
         {time

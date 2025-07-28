@@ -26,16 +26,6 @@ const adData = [
     },
   },
   {
-    id: 2,
-    title: "Send us Feedback",
-    description: "Got any feedback? We'd love to hear from you!",
-    url: "https://workfromcoffee.featurebase.app",
-    thumbnail: {
-      type: "emoji",
-      content: "💬",
-    },
-  },
-  {
     id: 3,
     title: "Screen Studio",
     description: "Beautiful screen recordings in minutes",

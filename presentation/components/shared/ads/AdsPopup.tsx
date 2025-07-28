@@ -16,26 +16,6 @@ const adSettings = {
 // Sample ad data with both image and emoji options
 const adData = [
   {
-    id: 1,
-    title: "NextJS Global Hackathon",
-    description: "WFC OS is the winner of the Highest Quality App category",
-    url: "https://workfromcoffee.com/blog/wfcos-hackathon-award-announcement",
-    thumbnail: {
-      type: "emoji",
-      content: "🏆",
-    },
-  },
-  {
-    id: 2,
-    title: "Send us Feedback",
-    description: "Got any feedback? We'd love to hear from you!",
-    url: "https://workfromcoffee.featurebase.app",
-    thumbnail: {
-      type: "emoji",
-      content: "💬",
-    },
-  },
-  {
     id: 3,
     title: "Screen Studio",
     description: "Beautiful screen recordings in minutes",
