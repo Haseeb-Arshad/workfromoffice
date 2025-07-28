@@ -254,17 +254,17 @@ export const PassportView: React.FC = () => {
                         <Clock className="w-4 h-4 text-gray-500" />
                         <span className="font-medium text-gray-900">Work Style</span>
                       </div>
-                      <p className="text-sm text-gray-700">{selectedEmployee.fieldNotes.workStyle}</p>
+                      <p className="text-sm text-gray-700">{selectedEmployee.fieldNotes.workingStyle}</p>
                     </div>
                   )}
 
-                  {selectedEmployee.fieldNotes.remoteLocation && (
+                  {selectedEmployee.fieldNotes.timezone && (
                     <div className="p-3 bg-gray-50 rounded border border-gray-200">
                       <div className="flex items-center gap-2 mb-1">
                         <Globe className="w-4 h-4 text-gray-500" />
-                        <span className="font-medium text-gray-900">Remote Work Location</span>
+                        <span className="font-medium text-gray-900">Timezone</span>
                       </div>
-                      <p className="text-sm text-gray-700">{selectedEmployee.fieldNotes.remoteLocation}</p>
+                      <p className="text-sm text-gray-700">{selectedEmployee.fieldNotes.timezone}</p>
                     </div>
                   )}
                 </div>
