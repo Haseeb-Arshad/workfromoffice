@@ -63,7 +63,7 @@ export const TaskbarMenu = () => {
     <>
       <MenubarMenu>
         <div className="px-1">
-          <Image src="/icons/coffee.png" alt="coffee" width={20} height={20} />
+          <Image src="/icons/office.png" alt="office" width={20} height={20} />
         </div>
       </MenubarMenu>
       <MenubarMenu>
