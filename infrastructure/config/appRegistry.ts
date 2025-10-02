@@ -12,16 +12,8 @@ import Bookmark from "@/app/(bookmark)/Bookmark";
 import { SettingsPanel } from "@/app/(settings)/SettingsPanel";
 import SessionLogApp from "@/app/(session-log)/SessionLogApp";
 import Announcements from "@/app/(announcements)/Announcements";
-import { Kudos } from "@/app/(kudos)/Kudos";
 import { Schedule } from "@/app/(schedule)/Schedule";
-import { ResourceCenter } from "@/app/(resource-center)/ResourceCenter";
-import { HRPortal } from "@/app/(resource-center)/components/HRPortal";
-import { ITHelpdesk } from "@/app/(resource-center)/components/ITHelpdesk";
-import { CompanyWiki } from "@/app/(resource-center)/components/CompanyWiki";
-import { DesignSystem } from "@/app/(resource-center)/components/DesignSystem";
-import Teahouse from "@/app/(teahouse)/Teahouse";
-import VillageWell from "@/app/(village-well)/VillageWell";
-import TravelersDirectory from "@/app/(travelers-directory)/TravelersDirectory";
+import AiAssistant from "@/app/(ai-assistant)/AiAssistant";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -134,13 +126,6 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     minSize: { width: 400, height: 450 },
     component: Announcements,
   },
-  kudos: {
-    name: "Team Kudos",
-    src: "/icons/kudos-star.png",
-    defaultSize: { width: 600, height: 700 },
-    minSize: { width: 450, height: 500 },
-    component: Kudos,
-  },
   schedule: {
     name: "My Day",
     src: "/icons/myday.png",
@@ -148,65 +133,12 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     minSize: { width: 400, height: 500 },
     component: Schedule,
   },
-  resourceCenter: {
-    name: "Resources",
-    src: "/icons/book.png",
-    defaultSize: { width: 800, height: 700 },
-    minSize: { width: 600, height: 500 },
-    component: ResourceCenter,
-  },
-  hrPortal: {
-    name: "HR Portal",
-    src: "/icons/hr-portal.png",
-    defaultSize: { width: 900, height: 700 },
-    minSize: { width: 600, height: 500 },
-    component: HRPortal,
-    hidden: true,
-  },
-  itHelpdesk: {
-    name: "IT Helpdesk",
-    src: "/icons/it-helpdesk.png",
-    defaultSize: { width: 900, height: 700 },
-    minSize: { width: 600, height: 500 },
-    component: ITHelpdesk,
-    hidden: true,
-  },
-  companyWiki: {
-    name: "Company Wiki",
-    src: "/icons/company-wiki.png",
-    defaultSize: { width: 900, height: 700 },
-    minSize: { width: 600, height: 500 },
-    component: CompanyWiki,
-    hidden: true,
-  },
-  designSystem: {
-    name: "Design System",
-    src: "/icons/design-system.png",
-    defaultSize: { width: 800, height: 600 },
-    minSize: { width: 600, height: 500 },
-    component: DesignSystem,
-    hidden: true,
-  },
-  teahouse: {
-    name: "The Teahouse",
-    src: "/icons/coffee.png",
-    defaultSize: { width: 800, height: 700 },
-    minSize: { width: 700, height: 600 },
-    component: Teahouse,
-  },
-  villageWell: {
-    name: "The Village Well",
-    src: "/icons/cafe.png",
-    defaultSize: { width: 900, height: 750 },
-    minSize: { width: 800, height: 650 },
-    component: VillageWell,
-  },
-  travelersDirectory: {
-    name: "The Fellowship",
-    src: "/icons/fellowship.png",
-    defaultSize: { width: 1000, height: 800 },
-    minSize: { width: 800, height: 600 },
-    component: TravelersDirectory,
+  aiAssistant: {
+    name: "AI Assistant",
+    src: "/icons/default.png",
+    defaultSize: { width: 500, height: 700 },
+    minSize: { width: 400, height: 500 },
+    component: AiAssistant,
   },
 };
 

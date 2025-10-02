@@ -7,17 +7,17 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 const font = Itim({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://workfromoffice.com"),
-  title: "Work from Office",
+  metadataBase: new URL("https://workbase.com"),
+  title: "WorkBase",
   description:
     "Virtual office environment designed for deep focus and remote work productivity. All-in-one workspace with integrated to-do lists, timers, notepads, music, and ambience for distraction-free work.",
   openGraph: {
     images: "/metadata/wfo-og.png",
-    title: "Work from Office",
+    title: "WorkBase",
     description:
       "Virtual office environment designed for deep focus and remote work productivity. All-in-one workspace with integrated to-do lists, timers, notepads, music, and ambience for distraction-free work.",
-    url: "https://workfromoffice.com",
-    siteName: "Work from Office",
+    url: "https://workbase.com",
+    siteName: "WorkBase",
     locale: "en_US",
     type: "website",
   },

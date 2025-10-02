@@ -63,7 +63,7 @@ export const TaskbarMenu = () => {
     <>
       <MenubarMenu>
         <div className="px-1">
-          <Image src="/icons/office.png" alt="office" width={20} height={20} />
+          <Image src="/icons/office.png" alt="WorkBase" width={20} height={20} />
         </div>
       </MenubarMenu>
       <MenubarMenu>
@@ -76,7 +76,7 @@ export const TaskbarMenu = () => {
           </MenubarItem>
           <MenubarItem
             inset
-            onSelect={() => openUrl("https://workfromcoffee.featurebase.app")}
+            onSelect={() => openUrl("https://workbase.featurebase.app")}
           >
             Feedback
           </MenubarItem>
@@ -125,14 +125,14 @@ export const TaskbarMenu = () => {
         </MenubarTrigger>
         <MenubarContent>
           <MenubarItem disabled>
-            WFO OS<MenubarShortcut>v 2.3.1</MenubarShortcut>
+            WorkBase OS<MenubarShortcut>v 3.0.0</MenubarShortcut>
           </MenubarItem>
           <MenubarItem inset onSelect={openChangelogWindow}>
             Changelog<MenubarShortcut>history</MenubarShortcut>
           </MenubarItem>
           <MenubarItem
             inset
-            onSelect={() => openUrl("https://github.com/Haseeb-Arshad/workfromoffice.git")}
+            onSelect={() => openUrl("https://github.com/workbase/workbase.git")}
           >
             Github<MenubarShortcut>repository</MenubarShortcut>
           </MenubarItem>

@@ -5,13 +5,52 @@ import { useAtom } from "jotai";
 import { eventsAtom } from "@/application/atoms/scheduleAtom";
 import { EventCard } from "./components/EventCard";
 import { EventForm } from "./components/EventForm";
-import { Plus, Calendar, Clock } from "lucide-react";
+// Import mockCalendarEvents for now, Google Calendar service will be server-side
+const mockCalendarEvents = [
+  {
+    id: '1',
+    summary: 'Morning Standup',
+    description: 'Daily team sync meeting',
+    start: {
+      dateTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+      timeZone: 'America/New_York',
+    },
+    end: {
+      dateTime: new Date(Date.now() + 2.5 * 60 * 60 * 1000).toISOString(),
+      timeZone: 'America/New_York',
+    },
+    location: 'Conference Room A',
+    colorId: '2',
+    status: 'confirmed',
+  },
+  {
+    id: '2',
+    summary: 'Project Review',
+    description: 'Quarterly project review with stakeholders',
+    start: {
+      dateTime: new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString(),
+      timeZone: 'America/New_York',
+    },
+    end: {
+      dateTime: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
+      timeZone: 'America/New_York',
+    },
+    location: 'Virtual Meeting',
+    colorId: '4',
+    status: 'confirmed',
+  },
+];
+import { Plus, Calendar, Clock, Settings } from "lucide-react";
+import { CalendarIntegration } from "./components/CalendarIntegration";
 
 const Schedule = () => {
   const [events] = useAtom(eventsAtom);
   const [showForm, setShowForm] = useState(false);
   const [isFormAnimating, setIsFormAnimating] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showCalendarIntegration, setShowCalendarIntegration] = useState(false);
+  const [googleEvents, setGoogleEvents] = useState<typeof mockCalendarEvents>([]);
+  const [isCalendarConnected, setIsCalendarConnected] = useState(false);
 
   // Update current time every minute
   useEffect(() => {
@@ -20,6 +59,15 @@ const Schedule = () => {
     }, 60000);
     return () => clearInterval(timer);
   }, []);
+
+  // Load Google Calendar events (mock for now)
+  useEffect(() => {
+    // For demo purposes, use mock data
+    // In production, this would check authentication and fetch real events
+    if (isCalendarConnected) {
+      setGoogleEvents(mockCalendarEvents);
+    }
+  }, [isCalendarConnected]);
 
   const today = new Date();
   const todayString = today.toDateString();
@@ -91,28 +139,51 @@ const Schedule = () => {
           </div>
         </div>
         
-        <button
-          onClick={() => {
-            if (!showForm && !isFormAnimating) {
-              setIsFormAnimating(true);
-              // Small delay to prevent flicker
-              setTimeout(() => {
-                setShowForm(true);
-                setIsFormAnimating(false);
-              }, 50);
-            } else if (showForm) {
-              setShowForm(false);
-            }
-          }}
-          disabled={isFormAnimating}
-          className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white px-6 py-3 rounded-xl flex items-center gap-3 text-sm font-bold transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-          <Plus className="size-5" />
-          Add Event
-        </button>
+        <div className="flex gap-3">
+          <button
+            onClick={() => setShowCalendarIntegration(!showCalendarIntegration)}
+            className={`px-4 py-3 rounded-xl flex items-center gap-2 text-sm font-bold transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm relative overflow-hidden group ${
+              isCalendarConnected 
+                ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-600 text-white' 
+                : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-600 text-white'
+            }`}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+            <Settings className="size-4" />
+            {isCalendarConnected ? 'Calendar Connected' : 'Connect Calendar'}
+          </button>
+          
+          <button
+            onClick={() => {
+              if (!showForm && !isFormAnimating) {
+                setIsFormAnimating(true);
+                setTimeout(() => {
+                  setShowForm(true);
+                  setIsFormAnimating(false);
+                }, 50);
+              } else if (showForm) {
+                setShowForm(false);
+              }
+            }}
+            disabled={isFormAnimating}
+            className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white px-6 py-3 rounded-xl flex items-center gap-3 text-sm font-bold transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
+            <Plus className="size-5" />
+            Add Event
+          </button>
+        </div>
       </div>
 
+      {/* Calendar Integration Panel */}
+      {showCalendarIntegration && (
+        <CalendarIntegration 
+          onClose={() => setShowCalendarIntegration(false)}
+          isConnected={isCalendarConnected}
+          onConnectionChange={setIsCalendarConnected}
+        />
+      )}
+      
       {/* Add Event Form */}
       {showForm && (
         <EventForm onClose={() => {
@@ -132,9 +203,14 @@ const Schedule = () => {
               <p className="text-primary/70">
                 You have <span className="font-bold text-primary">{upcomingEvents.length}</span> upcoming events today
               </p>
+              {isCalendarConnected && googleEvents.length > 0 && (
+                <p className="text-secondary/70 text-sm mt-2">
+                  📅 Plus <span className="font-semibold">{googleEvents.length}</span> events from your Google Calendar
+                </p>
+              )}
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-primary">{todayEvents.length}</div>
+              <div className="text-2xl font-bold text-primary">{todayEvents.length + googleEvents.length}</div>
               <div className="text-sm text-primary/60">Total Events</div>
             </div>
           </div>
@@ -143,7 +219,7 @@ const Schedule = () => {
 
       {/* Timeline */}
       <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200/50 scrollbar-track-transparent">
-        {todayEvents.length === 0 ? (
+        {(todayEvents.length === 0 && googleEvents.length === 0) ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <div className="bg-gradient-to-br from-white/80 to-gray-50/40 backdrop-blur-sm rounded-3xl p-16 shadow-lg border border-gray-200/50 max-w-md">
               <div className="text-muted-foreground mb-8">
