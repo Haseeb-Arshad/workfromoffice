@@ -79,13 +79,20 @@ app.use((req, res) => {
 // Start Server
 const startServer = async () => {
   try {
-    // Connect to Database
-    await connectDatabase();
+    // Try to connect to Database, but don't fail if it's not available
+    try {
+      await connectDatabase();
+      logger.info('Database connected successfully');
+    } catch (dbError) {
+      logger.warn(`Database connection failed: ${dbError.message}`);
+      logger.info('Running without database connection');
+    }
     
     app.listen(PORT, () => {
       logger.info(`WorkBase API Server running on port ${PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV}`);
       logger.info(`Frontend URL: ${process.env.FRONTEND_URL}`);
+      logger.info('Backend is ready to receive requests!');
     });
   } catch (error) {
     logger.error(`Failed to start server: ${error.message}`);

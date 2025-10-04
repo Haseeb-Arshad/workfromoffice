@@ -1,7 +1,9 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Send, Bot, User, Minimize2, MessageCircle } from "lucide-react";
+import { Send, Bot, User, Minimize2, MessageCircle, AlertCircle, RotateCcw } from "lucide-react";
+import { aiApi } from "@/infrastructure/lib/api";
 
 interface Message {
   id: string;
@@ -26,48 +28,26 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Generate session ID on component mount
+  useEffect(() => {
+    const newSessionId = `workbase-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    setSessionId(newSessionId);
+  }, []);
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  const simulateAiResponse = (userMessage: string): string => {
-    const responses = [
-      "That's an excellent question! Let me help you with that. Based on what you're asking, I'd recommend focusing on breaking down the task into smaller, manageable steps.",
-      "I understand what you're looking for. Here's my suggestion: try approaching this systematically, and don't hesitate to ask if you need more specific guidance.",
-      "Great point! This is definitely something I can help you with. Consider this approach, and let me know if you'd like me to elaborate on any part.",
-      "I see what you're getting at. This is a common challenge, and there are several effective strategies we could explore together.",
-      "That's a thoughtful question. Let me provide you with a comprehensive answer that should address your concerns and help you move forward.",
-      "Excellent! I'm happy to help you with this. Based on your question, I think the best approach would be to start with the fundamentals and build from there.",
-    ];
-    
-    // Simple keyword-based responses
-    if (userMessage.toLowerCase().includes("help") || userMessage.toLowerCase().includes("assist")) {
-      return "I'm here to help you with a wide range of tasks! I can assist with productivity tips, answer questions, help brainstorm ideas, provide explanations on various topics, or just have a conversation. What specific area would you like help with?";
-    }
-    
-    if (userMessage.toLowerCase().includes("task") || userMessage.toLowerCase().includes("work") || userMessage.toLowerCase().includes("project")) {
-      return "Great! I'd love to help you with your work or project. To provide the most useful assistance, could you tell me more details about what you're working on? I can help with planning, organization, problem-solving, or breaking down complex tasks into manageable steps.";
-    }
-    
-    if (userMessage.toLowerCase().includes("productivity") || userMessage.toLowerCase().includes("focus")) {
-      return "Productivity is all about finding the right balance and systems that work for you! Some effective strategies include: time-blocking your calendar, using the Pomodoro technique, minimizing distractions, and taking regular breaks. What specific productivity challenges are you facing?";
-    }
-
-    if (userMessage.toLowerCase().includes("idea") || userMessage.toLowerCase().includes("creative") || userMessage.toLowerCase().includes("brainstorm")) {
-      return "I love helping with creative thinking and brainstorming! The best ideas often come from combining different perspectives and approaches. What kind of project or challenge are you looking to generate ideas for? I can help you explore different angles and possibilities.";
-    }
-    
-    return responses[Math.floor(Math.random() * responses.length)];
-  };
-
   const handleSendMessage = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || !sessionId) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -77,21 +57,59 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const messageContent = input;
     setInput("");
     setIsLoading(true);
+    setError(null);
 
-    // Simulate AI response delay
-    setTimeout(() => {
+    try {
+      // Call backend API
+      const response = await aiApi.chat(messageContent, sessionId);
+      
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content: simulateAiResponse(input),
+        content: response.data.message,
         timestamp: new Date(),
       };
       
       setMessages(prev => [...prev, aiResponse]);
+    } catch (error) {
+      console.error('AI Chat Error:', error);
+      setError(error instanceof Error ? error.message : 'Failed to get AI response');
+      
+      // Add error message to chat
+      const errorMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        role: "assistant",
+        content: "I'm sorry, I'm having trouble connecting to my AI service right now. Please make sure the backend server is running and try again.",
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1000 + Math.random() * 2000);
+    }
+  };
+
+  const clearConversation = async () => {
+    if (!sessionId) return;
+    
+    try {
+      await aiApi.clearConversation(sessionId);
+      setMessages([
+        {
+          id: "welcome-new",
+          role: "assistant",
+          content: "Hello! I'm your AI Assistant. How can I help you today?",
+          timestamp: new Date(),
+        },
+      ]);
+      setError(null);
+    } catch (error) {
+      console.error('Clear conversation error:', error);
+      setError('Failed to clear conversation');
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -106,77 +124,89 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
       <div className="fixed bottom-6 right-6 z-50">
         <button
           onClick={onToggleMinimize}
-          className="w-16 h-16 rounded-full bg-gradient-to-br from-secondary to-accent text-white shadow-2xl hover:scale-110 transition-all duration-300 flex items-center justify-center group relative overflow-hidden"
+          className="w-14 h-14 rounded-full bg-gradient-to-br from-secondary to-accent text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-          <MessageCircle className="w-8 h-8" />
-          <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full animate-pulse"></div>
+          <Bot className="w-6 h-6" />
         </button>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-orange-50 via-amber-50/30 to-yellow-50/20 relative overflow-hidden">
+    <div className="flex flex-col h-full bg-background/50 backdrop-blur-sm">
       {/* Header */}
-      <div className="bg-gradient-to-r from-white/80 to-gray-50/40 backdrop-blur-sm border-b border-gray-200/50 p-6">
+      <div className="bg-white/60 backdrop-blur-md border-b border-primary/10 px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="p-3 rounded-xl bg-gradient-to-br from-white/60 to-gray-50/60 shadow-sm">
-                <Bot className="w-8 h-8 text-primary" />
-              </div>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full"></div>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-secondary/90 to-accent/90 flex items-center justify-center shadow-sm">
+              <Bot className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-primary tracking-tight">
-                AI Assistant
-              </h1>
-              <p className="text-primary/60 text-sm">Your intelligent workspace companion</p>
+              <h1 className="text-lg font-bold text-primary">AI Assistant</h1>
+              <p className="text-xs text-primary/50">Always here to help</p>
             </div>
           </div>
-          {onToggleMinimize && (
-            <div className="flex gap-2">
+          <div className="flex gap-1.5">
+            <button
+              onClick={clearConversation}
+              className="p-2 rounded-lg hover:bg-white/70 transition-colors"
+              title="Clear conversation"
+            >
+              <RotateCcw className="w-4 h-4 text-primary/60" />
+            </button>
+            {onToggleMinimize && (
               <button
                 onClick={onToggleMinimize}
-                className="p-2 rounded-xl bg-white/50 hover:bg-white/70 transition-colors"
+                className="p-2 rounded-lg hover:bg-white/70 transition-colors"
               >
-                <Minimize2 className="w-5 h-5 text-gray-600" />
+                <Minimize2 className="w-4 h-4 text-primary/60" />
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
+      {/* Error Banner */}
+      {error && (
+        <div className="mx-4 mt-3 p-2.5 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-sm">
+          <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+          <p className="text-red-700 text-xs flex-1">{error}</p>
+          <button
+            onClick={() => setError(null)}
+            className="text-red-600 hover:text-red-800 text-lg leading-none"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin scrollbar-thumb-gray-200/50 scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`flex gap-4 ${message.role === "user" ? "justify-end" : ""}`}
+            className={`flex gap-2.5 ${message.role === "user" ? "justify-end" : ""}`}
           >
             {message.role === "assistant" && (
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-secondary/20 to-accent/30 flex items-center justify-center">
-                  <Bot className="w-6 h-6 text-primary" />
+                <div className="w-7 h-7 rounded-lg bg-white/70 backdrop-blur-sm flex items-center justify-center border border-primary/10">
+                  <Bot className="w-4 h-4 text-secondary" />
                 </div>
               </div>
             )}
             
             <div
-              className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${
+              className={`max-w-[75%] px-3 py-2.5 rounded-xl text-sm ${
                 message.role === "user"
-                  ? "bg-gradient-to-br from-secondary to-accent text-white"
-                  : "bg-gradient-to-br from-white/80 to-gray-50/40 backdrop-blur-sm border border-gray-200/50"
+                  ? "bg-gradient-to-br from-secondary to-accent text-white shadow-sm"
+                  : "bg-white/70 backdrop-blur-sm border border-primary/10 text-primary"
               }`}
             >
-              <p className={`text-sm leading-relaxed ${
-                message.role === "user" ? "text-white" : "text-primary"
-              }`}>
+              <p className="leading-relaxed whitespace-pre-wrap">
                 {message.content}
               </p>
-              <div className={`text-xs mt-2 ${
-                message.role === "user" ? "text-white/70" : "text-primary/60"
+              <div className={`text-[10px] mt-1.5 ${
+                message.role === "user" ? "text-white/60" : "text-primary/40"
               }`}>
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
@@ -184,8 +214,8 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
 
             {message.role === "user" && (
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-secondary/20 to-accent/30 flex items-center justify-center">
-                  <User className="w-6 h-6 text-primary" />
+                <div className="w-7 h-7 rounded-lg bg-white/70 backdrop-blur-sm flex items-center justify-center border border-primary/10">
+                  <User className="w-4 h-4 text-secondary" />
                 </div>
               </div>
             )}
@@ -193,20 +223,17 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
         ))}
 
         {isLoading && (
-          <div className="flex gap-4">
+          <div className="flex gap-2.5">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-secondary/20 to-accent/30 flex items-center justify-center">
-                <Bot className="w-6 h-6 text-primary" />
+              <div className="w-7 h-7 rounded-lg bg-white/70 backdrop-blur-sm flex items-center justify-center border border-primary/10">
+                <Bot className="w-4 h-4 text-secondary" />
               </div>
             </div>
-            <div className="max-w-[80%] p-4 rounded-2xl bg-gradient-to-br from-white/80 to-gray-50/40 backdrop-blur-sm border border-gray-200/50">
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce"></div>
-                  <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                  <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                </div>
-                <span className="text-sm text-primary/70">AI is thinking...</span>
+            <div className="px-3 py-2.5 rounded-xl bg-white/70 backdrop-blur-sm border border-primary/10">
+              <div className="flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 rounded-full bg-secondary/70 animate-bounce"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-secondary/70 animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-secondary/70 animate-bounce" style={{animationDelay: '0.2s'}}></div>
               </div>
             </div>
           </div>
@@ -216,28 +243,23 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
       </div>
 
       {/* Input */}
-      <div className="p-6 bg-gradient-to-r from-white/80 to-gray-50/40 backdrop-blur-sm border-t border-gray-200/50">
-        <div className="flex gap-3">
-          <div className="flex-1 relative">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder="Ask me anything or describe what you need help with..."
-              className="w-full p-4 pr-12 rounded-xl bg-white/80 backdrop-blur-sm border border-gray-200/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 resize-none transition-all duration-200 text-primary placeholder:text-primary/50"
-              rows={2}
-            />
-            <div className="absolute bottom-3 right-3 text-primary/40">
-              <MessageCircle className="w-5 h-5" />
-            </div>
-          </div>
+      <div className="p-4 bg-white/60 backdrop-blur-md border-t border-primary/10">
+        <div className="flex gap-2">
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyPress}
+            placeholder="Type your message..."
+            className="flex-1 px-3 py-2.5 rounded-lg bg-white/80 backdrop-blur-sm border border-primary/10 focus:outline-none focus:ring-2 focus:ring-secondary/30 focus:border-secondary/30 resize-none transition-all text-sm text-primary placeholder:text-primary/40"
+            rows={1}
+            disabled={isLoading}
+          />
           <button
             onClick={handleSendMessage}
-            disabled={!input.trim() || isLoading}
-            className="px-6 py-4 rounded-xl bg-gradient-to-r from-secondary to-accent hover:from-accent hover:to-secondary text-white font-semibold transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 relative overflow-hidden group"
+            disabled={!input.trim() || isLoading || !sessionId}
+            className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-secondary to-accent hover:from-accent hover:to-secondary text-white font-medium transition-all duration-200 hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-            <Send className="w-5 h-5" />
+            <Send className="w-4 h-4" />
           </button>
         </div>
       </div>

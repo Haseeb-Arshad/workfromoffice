@@ -29,52 +29,59 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
     switch (event.type) {
       case "meeting":
         return {
-          bg: "bg-gradient-to-br from-blue-50 to-indigo-100/60",
-          border: "border-blue-200/60",
+          bg: "bg-blue-50/60",
+          border: "border-blue-200/50",
           accent: "bg-blue-500",
-          icon: "text-blue-600"
+          icon: "text-blue-600",
+          badge: "bg-blue-100 text-blue-700"
         };
       case "presentation":
         return {
-          bg: "bg-gradient-to-br from-purple-50 to-pink-100/60", 
-          border: "border-purple-200/60",
+          bg: "bg-purple-50/60", 
+          border: "border-purple-200/50",
           accent: "bg-purple-500",
-          icon: "text-purple-600"
+          icon: "text-purple-600",
+          badge: "bg-purple-100 text-purple-700"
         };
       case "workshop":
         return {
-          bg: "bg-gradient-to-br from-green-50 to-emerald-100/60",
-          border: "border-green-200/60", 
+          bg: "bg-green-50/60",
+          border: "border-green-200/50", 
           accent: "bg-green-500",
-          icon: "text-green-600"
+          icon: "text-green-600",
+          badge: "bg-green-100 text-green-700"
         };
       case "break":
         return {
-          bg: "bg-gradient-to-br from-orange-50 to-amber-100/60",
-          border: "border-orange-200/60",
+          bg: "bg-orange-50/60",
+          border: "border-orange-200/50",
           accent: "bg-orange-500",
-          icon: "text-orange-600"
+          icon: "text-orange-600",
+          badge: "bg-orange-100 text-orange-700"
         };
       case "call":
         return {
-          bg: "bg-gradient-to-br from-cyan-50 to-blue-100/60",
-          border: "border-cyan-200/60",
+          bg: "bg-cyan-50/60",
+          border: "border-cyan-200/50",
           accent: "bg-cyan-500",
-          icon: "text-cyan-600"
+          icon: "text-cyan-600",
+          badge: "bg-cyan-100 text-cyan-700"
         };
       case "deadline":
         return {
-          bg: "bg-gradient-to-br from-red-50 to-pink-100/60",
-          border: "border-red-200/60",
+          bg: "bg-red-50/60",
+          border: "border-red-200/50",
           accent: "bg-red-500",
-          icon: "text-red-600"
+          icon: "text-red-600",
+          badge: "bg-red-100 text-red-700"
         };
       default:
         return {
-          bg: "bg-gradient-to-br from-gray-50 to-slate-100/60",
-          border: "border-gray-200/60",
+          bg: "bg-white/70",
+          border: "border-primary/10",
           accent: "bg-gray-500",
-          icon: "text-gray-600"
+          icon: "text-gray-600",
+          badge: "bg-gray-100 text-gray-700"
         };
     }
   };
@@ -121,88 +128,84 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
 
   return (
     <div
-      className={`relative overflow-hidden rounded-2xl border-2 ${colors.border} ${colors.bg} backdrop-blur-sm hover:shadow-xl transition-all duration-300 hover:scale-[1.01] group ${
-        !isUpcoming ? 'opacity-70' : ''
-      } ${isCurrentEvent() ? 'ring-2 ring-indigo-400 ring-opacity-50' : ''}`}
+      className={`relative overflow-hidden rounded-xl border ${colors.border} ${colors.bg} backdrop-blur-sm hover:shadow-md transition-all duration-200 group ${
+        !isUpcoming ? 'opacity-60' : ''
+      } ${isCurrentEvent() ? 'ring-2 ring-secondary/40' : ''}`}
     >
       {/* Current event indicator */}
       {isCurrentEvent() && (
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-blue-500 animate-pulse" />
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-secondary to-accent" />
       )}
 
       {/* Decorative accent bar */}
-      <div className={`absolute left-0 top-0 w-1.5 h-full ${colors.accent} shadow-sm`} />
+      <div className={`absolute left-0 top-0 w-1 h-full ${colors.accent}`} />
       
       {/* Main content */}
-      <div className="relative p-5 pl-7">
+      <div className="relative p-3 pl-4">
         {/* Header with time and actions */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-full bg-white/60 backdrop-blur-sm">
-                <Clock className="size-4 text-indigo-600" />
-              </div>
-              <span className="text-lg font-bold text-primary">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-primary/60" />
+              <span className="text-sm font-semibold text-primary">
                 {formatTimeRange()}
               </span>
-              {isCurrentEvent() && (
-                <div className="px-2 py-1 bg-gradient-to-r from-indigo-500 to-blue-500 text-white text-xs font-bold rounded-full animate-pulse">
-                  LIVE
-                </div>
-              )}
             </div>
-            {event.isRecurring && (
-              <div className="p-1 rounded-full bg-white/60">
-                <Repeat className="size-3 text-primary/60" />
+            {isCurrentEvent() && (
+              <div className="px-2 py-0.5 bg-gradient-to-r from-secondary to-accent text-white text-[10px] font-bold rounded-full">
+                LIVE
               </div>
+            )}
+            {event.isRecurring && (
+              <Repeat className="w-3 h-3 text-primary/40" />
             )}
             {getPriorityIndicator()}
           </div>
 
           <button
             onClick={() => removeEvent(event.id)}
-            className="text-gray-400 hover:text-red-500 transition-colors p-1.5 rounded-full hover:bg-white/60 backdrop-blur-sm opacity-0 group-hover:opacity-100"
+            className="text-primary/30 hover:text-red-500 transition-colors p-1 rounded hover:bg-white/50 opacity-0 group-hover:opacity-100"
             title="Remove event"
           >
-            <X className="size-4" />
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
 
         {/* Event title and type */}
-        <div className="mb-4">
-          <div className="flex items-center gap-3 mb-2">
-            <h3 className="text-xl font-bold text-primary leading-tight">
+        <div className="mb-2.5">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="text-base font-bold text-primary leading-snug">
               {event.title}
             </h3>
-            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${colors.accent} text-white shadow-sm`}>
+            <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${colors.badge}`}>
               {event.type.toUpperCase()}
             </span>
           </div>
           {event.description && (
-            <p className="text-sm text-primary/80 leading-relaxed">
+            <p className="text-xs text-primary/70 leading-relaxed line-clamp-2">
               {event.description}
             </p>
           )}
         </div>
 
         {/* Event details */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           {/* Meeting type and location */}
           {(event.meetingType || event.location) && (
-            <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap">
               {event.meetingType && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/60 backdrop-blur-sm rounded-full">
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-white/50 backdrop-blur-sm rounded-md">
                   {getMeetingTypeIcon()}
-                  <span className="text-xs font-semibold text-primary/70 capitalize">
+                  <span className="text-[10px] font-medium text-primary/70 capitalize">
                     {event.meetingType}
                   </span>
                 </div>
               )}
               
               {event.location && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-white/60 backdrop-blur-sm rounded-full">
-                  <MapPin className="size-4 text-gray-600" />
-                  <span className="text-xs font-medium text-primary/70">
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-white/50 backdrop-blur-sm rounded-md">
+                  <MapPin className="w-3 h-3 text-primary/60" />
+                  <span className="text-[10px] font-medium text-primary/70">
                     {event.location}
                   </span>
                 </div>
@@ -212,22 +215,20 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
 
           {/* Attendees */}
           {event.attendees && event.attendees.length > 0 && (
-            <div className="flex items-center gap-2">
-              <div className="p-1 rounded-full bg-white/60">
-                <Users className="size-3 text-primary/60" />
-              </div>
+            <div className="flex items-center gap-1.5">
+              <Users className="w-3 h-3 text-primary/50" />
               <div className="flex flex-wrap gap-1">
                 {event.attendees.slice(0, 3).map((attendee, index) => (
                   <span
                     key={index}
-                    className="px-2 py-1 bg-white/40 backdrop-blur-sm rounded-full text-xs font-medium text-primary/70"
+                    className="px-1.5 py-0.5 bg-white/40 backdrop-blur-sm rounded text-[10px] font-medium text-primary/70"
                   >
                     {attendee}
                   </span>
                 ))}
                 {event.attendees.length > 3 && (
-                  <span className="px-2 py-1 bg-white/40 backdrop-blur-sm rounded-full text-xs font-medium text-primary/70">
-                    +{event.attendees.length - 3} more
+                  <span className="px-1.5 py-0.5 bg-white/40 backdrop-blur-sm rounded text-[10px] font-medium text-primary/70">
+                    +{event.attendees.length - 3}
                   </span>
                 )}
               </div>
@@ -235,13 +236,6 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
           )}
         </div>
       </div>
-
-      {/* Subtle shimmer effect */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      
-      {/* Decorative corner elements */}
-      <div className="absolute top-2 right-2 w-16 h-16 bg-gradient-to-br from-white/20 to-transparent rounded-full -translate-y-8 translate-x-8 opacity-50" />
-      <div className="absolute bottom-2 left-2 w-12 h-12 bg-gradient-to-tr from-white/15 to-transparent rounded-full translate-y-6 -translate-x-6 opacity-50" />
     </div>
   );
 };

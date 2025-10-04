@@ -129,15 +129,15 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
   schedule: {
     name: "My Day",
     src: "/icons/myday.png",
-    defaultSize: { width: 480, height: 600 },
-    minSize: { width: 400, height: 500 },
+    defaultSize: { width: 420, height: 580 },
+    minSize: { width: 380, height: 480 },
     component: Schedule,
   },
   aiAssistant: {
     name: "AI Assistant",
     src: "/icons/default.png",
-    defaultSize: { width: 500, height: 700 },
-    minSize: { width: 400, height: 500 },
+    defaultSize: { width: 420, height: 600 },
+    minSize: { width: 380, height: 500 },
     component: AiAssistant,
   },
 };

@@ -113,65 +113,56 @@ const Schedule = () => {
   );
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-green-50 via-emerald-50/30 to-teal-50/20 p-6">
+    <div className="flex flex-col h-full bg-background/50 backdrop-blur-sm">
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-4">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-white/60 to-gray-50/60 shadow-sm">
-            <Calendar className="w-8 h-8 text-primary" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-primary tracking-tight">My Day</h1>
-            <div className="flex items-center gap-4 mt-1">
-              <div className="flex items-center gap-2 text-sm text-primary/60">
-                <div className="p-1 rounded-full bg-white/50">
-                  <Calendar className="size-3" />
-                </div>
-                <span className="font-medium">{formatDate(today)}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-primary/60">
-                <div className="p-1 rounded-full bg-white/50">
-                  <Clock className="size-3" />
-                </div>
-                <span className="font-medium">{formatCurrentTime(currentTime)}</span>
+      <div className="bg-white/60 backdrop-blur-md border-b border-primary/10 px-4 py-3">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-secondary/90 to-accent/90 flex items-center justify-center shadow-sm">
+              <Calendar className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold text-primary">My Day</h1>
+              <div className="flex items-center gap-2 text-xs text-primary/50">
+                <span>{formatDate(today)}</span>
+                <span>•</span>
+                <span>{formatCurrentTime(currentTime)}</span>
               </div>
             </div>
           </div>
-        </div>
-        
-        <div className="flex gap-3">
-          <button
-            onClick={() => setShowCalendarIntegration(!showCalendarIntegration)}
-            className={`px-4 py-3 rounded-xl flex items-center gap-2 text-sm font-bold transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm relative overflow-hidden group ${
-              isCalendarConnected 
-                ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-600 text-white' 
-                : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-600 text-white'
-            }`}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-            <Settings className="size-4" />
-            {isCalendarConnected ? 'Calendar Connected' : 'Connect Calendar'}
-          </button>
           
-          <button
-            onClick={() => {
-              if (!showForm && !isFormAnimating) {
-                setIsFormAnimating(true);
-                setTimeout(() => {
-                  setShowForm(true);
-                  setIsFormAnimating(false);
-                }, 50);
-              } else if (showForm) {
-                setShowForm(false);
-              }
-            }}
-            disabled={isFormAnimating}
-            className="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-600 text-white px-6 py-3 rounded-xl flex items-center gap-3 text-sm font-bold transition-all duration-200 hover:scale-105 shadow-lg hover:shadow-xl backdrop-blur-sm relative overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
-            <Plus className="size-5" />
-            Add Event
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowCalendarIntegration(!showCalendarIntegration)}
+              className={`px-3 py-2 rounded-lg flex items-center gap-1.5 text-xs font-medium transition-all shadow-sm ${
+                isCalendarConnected 
+                  ? 'bg-green-50 border border-green-200 text-green-700 hover:bg-green-100' 
+                  : 'bg-blue-50 border border-blue-200 text-blue-700 hover:bg-blue-100'
+              }`}
+            >
+              <Settings className="w-3.5 h-3.5" />
+              {isCalendarConnected ? 'Connected' : 'Calendar'}
+            </button>
+            
+            <button
+              onClick={() => {
+                if (!showForm && !isFormAnimating) {
+                  setIsFormAnimating(true);
+                  setTimeout(() => {
+                    setShowForm(true);
+                    setIsFormAnimating(false);
+                  }, 50);
+                } else if (showForm) {
+                  setShowForm(false);
+                }
+              }}
+              disabled={isFormAnimating}
+              className="bg-gradient-to-r from-secondary to-accent hover:from-accent hover:to-secondary text-white px-4 py-2 rounded-lg flex items-center gap-1.5 text-xs font-medium transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Add Event
+            </button>
+          </div>
         </div>
       </div>
 
@@ -193,71 +184,60 @@ const Schedule = () => {
       )}
 
       {/* Daily Overview */}
-      <div className="mb-6">
-        <div className="bg-gradient-to-r from-white/80 to-gray-50/40 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/50 shadow-sm">
+      <div className="p-4 pb-3">
+        <div className="bg-white/70 backdrop-blur-sm rounded-xl p-4 border border-primary/10">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-primary mb-2">
+              <h2 className="text-base font-bold text-primary mb-1">
                 Good {getTimeOfDay()}! ☀️
               </h2>
-              <p className="text-primary/70">
-                You have <span className="font-bold text-primary">{upcomingEvents.length}</span> upcoming events today
+              <p className="text-sm text-primary/60">
+                <span className="font-semibold text-primary">{upcomingEvents.length}</span> upcoming events
+                {isCalendarConnected && googleEvents.length > 0 && (
+                  <span className="text-secondary/60"> + {googleEvents.length} from Google</span>
+                )}
               </p>
-              {isCalendarConnected && googleEvents.length > 0 && (
-                <p className="text-secondary/70 text-sm mt-2">
-                  📅 Plus <span className="font-semibold">{googleEvents.length}</span> events from your Google Calendar
-                </p>
-              )}
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-primary">{todayEvents.length + googleEvents.length}</div>
-              <div className="text-sm text-primary/60">Total Events</div>
+              <div className="text-xl font-bold text-primary">{todayEvents.length + googleEvents.length}</div>
+              <div className="text-xs text-primary/50">total</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Timeline */}
-      <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200/50 scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto px-4 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
         {(todayEvents.length === 0 && googleEvents.length === 0) ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="bg-gradient-to-br from-white/80 to-gray-50/40 backdrop-blur-sm rounded-3xl p-16 shadow-lg border border-gray-200/50 max-w-md">
-              <div className="text-muted-foreground mb-8">
-                <div className="p-6 rounded-full bg-gradient-to-br from-gray-100 to-gray-200/60 mx-auto mb-8 w-fit">
-                  <Calendar className="w-20 h-20 text-gray-400" />
-                </div>
+            <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-10 border border-primary/10 max-w-sm">
+              <div className="p-8 rounded-2xl bg-white/50 mx-auto mb-6 w-fit">
+                <Calendar className="w-16 h-16 text-primary/40" />
               </div>
-              <h3 className="text-2xl font-bold text-primary mb-4">
+              <h3 className="text-xl font-bold text-primary mb-2">
                 Free Day! 🌅
               </h3>
-              <p className="text-primary/60 text-lg leading-relaxed">
-                No events scheduled for today. Perfect time to focus on deep work or plan ahead!
+              <p className="text-sm text-primary/60 leading-relaxed">
+                No events scheduled. Perfect time for deep work!
               </p>
-              <div className="flex justify-center mt-8">
-                <div className="flex space-x-2">
-                  <div className="w-3 h-3 rounded-full bg-gradient-to-r from-gray-300 to-gray-400 animate-pulse" />
-                  <div className="w-3 h-3 rounded-full bg-gradient-to-r from-gray-400 to-gray-300 animate-pulse" style={{animationDelay: '0.2s'}} />
-                  <div className="w-3 h-3 rounded-full bg-gradient-to-r from-gray-300 to-gray-400 animate-pulse" style={{animationDelay: '0.4s'}} />
-                </div>
-              </div>
             </div>
           </div>
         ) : (
-          <div className="space-y-6 pb-6">
+          <div className="space-y-4 pb-4">
             {/* Upcoming Events */}
             {upcomingEvents.length > 0 && (
               <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="h-0.5 flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-                  <div className="px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-150 rounded-full border border-gray-200/50">
-                    <span className="text-sm font-bold text-primary">
-                      ⏰ Upcoming Events
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-px flex-1 bg-primary/10" />
+                  <div className="px-3 py-1 bg-white/70 backdrop-blur-sm rounded-full border border-primary/10">
+                    <span className="text-xs font-semibold text-primary">
+                      ⏰ Upcoming
                     </span>
                   </div>
-                  <div className="h-0.5 flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+                  <div className="h-px flex-1 bg-primary/10" />
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {upcomingEvents.map((event, index) => (
                     <div
                       key={event.id}
@@ -273,18 +253,18 @@ const Schedule = () => {
 
             {/* Completed Events */}
             {completedEvents.length > 0 && (
-              <div>
-                <div className="flex items-center gap-3 mb-6 mt-8">
-                  <div className="h-0.5 flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-                  <div className="px-4 py-2 bg-gradient-to-r from-gray-100 to-gray-200/50 rounded-full border border-gray-200/50">
-                    <span className="text-sm font-bold text-primary/70">
-                      ✅ Completed Events
+              <div className="mt-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-px flex-1 bg-primary/10" />
+                  <div className="px-3 py-1 bg-white/70 backdrop-blur-sm rounded-full border border-primary/10">
+                    <span className="text-xs font-semibold text-primary/60">
+                      ✅ Completed
                     </span>
                   </div>
-                  <div className="h-0.5 flex-1 bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+                  <div className="h-px flex-1 bg-primary/10" />
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {completedEvents.map((event, index) => (
                     <div
                       key={event.id}
@@ -299,9 +279,9 @@ const Schedule = () => {
             )}
 
             {/* Footer motivation */}
-            <div className="flex justify-center pt-8">
-              <div className="bg-gradient-to-r from-gray-100/70 to-gray-200/70 backdrop-blur-sm rounded-2xl px-8 py-4 border border-gray-200/50">
-                <p className="text-center text-primary/70 font-medium">
+            <div className="flex justify-center pt-6">
+              <div className="bg-white/70 backdrop-blur-sm rounded-xl px-6 py-2.5 border border-primary/10">
+                <p className="text-center text-xs text-primary/60 font-medium">
                   ✨ Make today amazing! ✨
                 </p>
               </div>
