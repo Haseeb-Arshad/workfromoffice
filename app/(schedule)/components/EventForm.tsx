@@ -84,228 +84,251 @@ export const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
     return emojis[priority];
   };
 
+  if (!mounted) {
+    return null;
+  }
+
   const modalContent = (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9998] p-4 animate-in fade-in-0 duration-200">
-      <div className="bg-gradient-to-br from-white/95 to-blue-50/90 backdrop-blur-lg rounded-3xl border-2 border-white/30 shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
-        {/* Header */}
-        <div className="relative p-6 border-b border-white/20">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-full bg-gradient-to-br from-indigo-500 to-blue-600 shadow-lg">
-              <Plus className="size-6 text-white" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-indigo-700 bg-clip-text text-transparent">
-                Add New Event
-              </h2>
-              <p className="text-sm text-primary/60">Schedule your upcoming meeting or event</p>
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9998] p-4">
+      <div className="relative w-full max-w-xl max-h-[92vh] overflow-y-auto">
+        {/* Main container */}
+        <div className="relative bg-white rounded-xl border border-primary/10 shadow-md overflow-hidden">
+          {/* Header */}
+          <div className="relative p-5 pb-4 border-b border-primary/10">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-white/80 border border-primary/10 flex items-center justify-center">
+                  <Plus className="size-5 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-primary tracking-tight mb-0.5">
+                    Create New Event
+                  </h2>
+                  <p className="text-xs text-primary/60">Schedule your day with precision</p>
+                </div>
+              </div>
+              
+              <button
+                onClick={onClose}
+                className="p-2 rounded-md bg-white/80 border border-primary/10 hover:bg-white"
+                aria-label="Close"
+              >
+                <X className="size-4 text-primary/60" />
+              </button>
             </div>
           </div>
-          
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full bg-white/60 hover:bg-white/80 transition-colors"
-          >
-            <X className="size-5 text-gray-600" />
-          </button>
-        </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="px-7 pb-7 space-y-5">
           {/* Title */}
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-primary flex items-center gap-2">
-              <Calendar className="size-4" />
+          <div className="space-y-2.5">
+            <label className="text-xs font-black text-primary/70 uppercase tracking-wider flex items-center gap-2">
+              <Calendar className="size-4 text-secondary" />
               Event Title *
             </label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => handleChange("title", e.target.value)}
-              placeholder="Enter event title..."
-              className="w-full p-4 bg-white/60 backdrop-blur-sm border-2 border-white/30 rounded-2xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 transition-all text-primary placeholder-primary/50"
-              required
-            />
+            <div>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => handleChange("title", e.target.value)}
+                placeholder="e.g., Team Standup Meeting..."
+                className="relative w-full px-4 py-3.5 bg-white/80 backdrop-blur-sm border-2 border-primary/15 rounded-2xl focus:outline-none focus:border-secondary/50 focus:bg-white transition-all text-primary placeholder-primary/40 font-medium shadow-sm"
+                required
+              />
+            </div>
           </div>
 
           {/* Description */}
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-primary">Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-              placeholder="Add event description..."
-              rows={3}
-              className="w-full p-4 bg-white/60 backdrop-blur-sm border-2 border-white/30 rounded-2xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 transition-all text-primary placeholder-primary/50 resize-none"
-            />
+          <div className="space-y-2.5">
+            <label className="text-xs font-black text-primary/70 uppercase tracking-wider">Description</label>
+            <div>
+              <textarea
+                value={formData.description}
+                onChange={(e) => handleChange("description", e.target.value)}
+                placeholder="Add details about your event..."
+                rows={3}
+                className="relative w-full px-4 py-3.5 bg-white/80 backdrop-blur-sm border-2 border-primary/15 rounded-2xl focus:outline-none focus:border-secondary/50 focus:bg-white transition-all text-primary placeholder-primary/40 resize-none font-medium shadow-sm"
+              />
+            </div>
           </div>
 
           {/* Time Range */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-primary flex items-center gap-2">
-                <Clock className="size-4" />
+            <div className="space-y-2.5">
+              <label className="text-xs font-black text-primary/70 uppercase tracking-wider flex items-center gap-2">
+                <Clock className="size-4 text-secondary" />
                 Start Time *
               </label>
+              <div className="relative group">
               <input
-                type="datetime-local"
-                value={formData.startTime}
-                onChange={(e) => handleChange("startTime", e.target.value)}
-                className="w-full p-4 bg-white/60 backdrop-blur-sm border-2 border-white/30 rounded-2xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 transition-all text-primary"
-                required
-              />
+                  type="datetime-local"
+                  value={formData.startTime}
+                  onChange={(e) => handleChange("startTime", e.target.value)}
+                  className="relative w-full px-4 py-3.5 bg-white/80 backdrop-blur-sm border-2 border-primary/15 rounded-2xl focus:outline-none focus:border-secondary/50 focus:bg-white transition-all text-primary font-medium shadow-sm"
+                  required
+                />
+              </div>
             </div>
             
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-primary flex items-center gap-2">
-                <Clock className="size-4" />
+            <div className="space-y-2.5">
+              <label className="text-xs font-black text-primary/70 uppercase tracking-wider flex items-center gap-2">
+                <Clock className="size-4 text-secondary" />
                 End Time *
               </label>
+              <div className="relative group">
               <input
-                type="datetime-local"
-                value={formData.endTime}
-                onChange={(e) => handleChange("endTime", e.target.value)}
-                className="w-full p-4 bg-white/60 backdrop-blur-sm border-2 border-white/30 rounded-2xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 transition-all text-primary"
-                required
-              />
+                  type="datetime-local"
+                  value={formData.endTime}
+                  onChange={(e) => handleChange("endTime", e.target.value)}
+                  className="relative w-full px-4 py-3.5 bg-white/80 backdrop-blur-sm border-2 border-primary/15 rounded-2xl focus:outline-none focus:border-secondary/50 focus:bg-white transition-all text-primary font-medium shadow-sm"
+                  required
+                />
+              </div>
             </div>
           </div>
 
           {/* Event Type */}
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-primary">Event Type</label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="space-y-3">
+            <label className="text-xs font-bold text-primary/70 uppercase tracking-wider">Event Type</label>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
               {(["meeting", "presentation", "workshop", "break", "call", "deadline"] as EventType[]).map((type) => (
                 <button
                   key={type}
                   type="button"
                   onClick={() => handleChange("type", type)}
-                  className={`p-3 rounded-2xl border-2 transition-all font-medium capitalize ${
+                  className={`p-3 rounded-lg border text-sm font-semibold capitalize ${
                     formData.type === type
-                      ? `bg-gradient-to-br ${getTypeColor(type)} text-white border-transparent shadow-lg`
-                      : "bg-white/40 border-white/30 text-primary hover:bg-white/60"
+                      ? "bg-primary text-white border-primary"
+                      : "bg-white border-primary/15 text-primary hover:bg-white"
                   }`}
                 >
-                  {type}
+                  <span>{type}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Meeting Type */}
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-primary">Meeting Format</label>
-            <div className="grid grid-cols-3 gap-3">
+          <div className="space-y-3">
+            <label className="text-xs font-bold text-primary/70 uppercase tracking-wider">Meeting Format</label>
+            <div className="grid grid-cols-3 gap-2">
               {(["virtual", "in-person", "hybrid"] as MeetingType[]).map((type) => (
                 <button
                   key={type}
                   type="button"
                   onClick={() => handleChange("meetingType", type)}
-                  className={`p-3 rounded-2xl border-2 transition-all font-medium capitalize ${
+                  className={`p-3 rounded-lg border text-sm font-semibold capitalize ${
                     formData.meetingType === type
-                      ? "bg-gradient-to-br from-indigo-500 to-blue-600 text-white border-transparent shadow-lg"
-                      : "bg-white/40 border-white/30 text-primary hover:bg-white/60"
+                      ? "bg-primary text-white border-primary"
+                      : "bg-white border-primary/15 text-primary hover:bg-white"
                   }`}
                 >
-                  {type}
+                  <span>{type}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Location */}
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-primary flex items-center gap-2">
-              <MapPin className="size-4" />
+          <div className="space-y-2.5">
+            <label className="text-xs font-black text-primary/70 uppercase tracking-wider flex items-center gap-2">
+              <MapPin className="size-4 text-secondary" />
               Location
             </label>
-            <input
-              type="text"
-              value={formData.location}
-              onChange={(e) => handleChange("location", e.target.value)}
-              placeholder="Meeting room, Zoom link, or address..."
-              className="w-full p-4 bg-white/60 backdrop-blur-sm border-2 border-white/30 rounded-2xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 transition-all text-primary placeholder-primary/50"
-            />
+            <div>
+              <input
+                type="text"
+                value={formData.location}
+                onChange={(e) => handleChange("location", e.target.value)}
+                placeholder="Meeting room, Zoom link, or address..."
+                className="relative w-full px-4 py-3.5 bg-white/80 backdrop-blur-sm border-2 border-primary/15 rounded-2xl focus:outline-none focus:border-secondary/50 focus:bg-white transition-all text-primary placeholder-primary/40 font-medium shadow-sm"
+              />
+            </div>
           </div>
 
           {/* Attendees */}
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-primary flex items-center gap-2">
-              <Users className="size-4" />
+          <div className="space-y-2.5">
+            <label className="text-xs font-black text-primary/70 uppercase tracking-wider flex items-center gap-2">
+              <Users className="size-4 text-secondary" />
               Attendees
             </label>
-            <input
-              type="text"
-              value={formData.attendees}
-              onChange={(e) => handleChange("attendees", e.target.value)}
-              placeholder="Enter names separated by commas..."
-              className="w-full p-4 bg-white/60 backdrop-blur-sm border-2 border-white/30 rounded-2xl focus:outline-none focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 transition-all text-primary placeholder-primary/50"
-            />
+            <div>
+              <input
+                type="text"
+                value={formData.attendees}
+                onChange={(e) => handleChange("attendees", e.target.value)}
+                placeholder="Enter names separated by commas..."
+                className="relative w-full px-4 py-3.5 bg-white/80 backdrop-blur-sm border-2 border-primary/15 rounded-2xl focus:outline-none focus:border-secondary/50 focus:bg-white transition-all text-primary placeholder-primary/40 font-medium shadow-sm"
+              />
+            </div>
           </div>
 
           {/* Priority */}
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-primary flex items-center gap-2">
-              <AlertCircle className="size-4" />
+          <div className="space-y-3">
+            <label className="text-xs font-bold text-primary/70 uppercase tracking-wider flex items-center gap-2">
+              <AlertCircle className="size-4 text-primary/60" />
               Priority
             </label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               {(["low", "medium", "high"] as Priority[]).map((priority) => (
                 <button
                   key={priority}
                   type="button"
                   onClick={() => handleChange("priority", priority)}
-                  className={`p-3 rounded-2xl border-2 transition-all font-medium capitalize flex items-center justify-center gap-2 ${
+                  className={`p-3 rounded-lg border flex items-center justify-center gap-2 text-sm font-semibold capitalize ${
                     formData.priority === priority
-                      ? "bg-gradient-to-br from-indigo-500 to-blue-600 text-white border-transparent shadow-lg"
-                      : "bg-white/40 border-white/30 text-primary hover:bg-white/60"
+                      ? "bg-primary text-white border-primary"
+                      : "bg-white border-primary/15 text-primary hover:bg-white"
                   }`}
                 >
-                  <span>{getPriorityEmoji(priority)}</span>
-                  {priority}
+                  <span className="text-base">{getPriorityEmoji(priority)}</span>
+                  <span>{priority}</span>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Recurring */}
-          <div className="flex items-center gap-3 p-4 bg-white/40 rounded-2xl border-2 border-white/30">
-            <input
-              type="checkbox"
-              id="recurring"
-              checked={formData.isRecurring}
-              onChange={(e) => handleChange("isRecurring", e.target.checked)}
-              className="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500"
-            />
-            <label htmlFor="recurring" className="text-sm font-semibold text-primary flex items-center gap-2">
-              <Repeat className="size-4" />
-              Recurring Event
-            </label>
+          <div>
+            <div className="relative flex items-center gap-3 p-4 bg-white/70 rounded-xl border border-primary/10">
+              <input
+                type="checkbox"
+                id="recurring"
+                checked={formData.isRecurring}
+                onChange={(e) => handleChange("isRecurring", e.target.checked)}
+                className="w-5 h-5 text-secondary rounded-lg border-2 border-primary/30 focus:ring-2 focus:ring-secondary/30 transition-all cursor-pointer"
+              />
+              <label htmlFor="recurring" className="text-sm font-bold text-primary flex items-center gap-2 cursor-pointer">
+                <Repeat className="size-4 text-secondary" />
+                Recurring Event
+              </label>
+            </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-4 pt-4">
+          <div className="flex gap-2 pt-5">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 p-4 bg-white/60 hover:bg-white/80 border-2 border-white/30 rounded-2xl font-semibold text-primary transition-all"
+              className="flex-1 px-4 py-3 bg-white border border-primary/15 rounded-lg font-semibold text-primary hover:bg-white"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 p-4 bg-gradient-to-br from-indigo-500 to-blue-600 hover:from-indigo-600 hover:to-blue-700 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all"
+              className="flex-1 px-4 py-3 bg-primary text-white rounded-lg font-semibold border border-primary"
             >
-              Create Event
+              <span className="flex items-center justify-center gap-2">
+                <Plus className="size-4" />
+                Create Event
+              </span>
             </button>
           </div>
         </form>
       </div>
     </div>
+    </div>
   );
-
-  if (!mounted) {
-    return null;
-  }
 
   return createPortal(modalContent, document.body);
 };

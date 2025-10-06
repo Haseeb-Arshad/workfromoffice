@@ -89,14 +89,14 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
   const getMeetingTypeIcon = () => {
     switch (event.meetingType) {
       case "virtual":
-        return <Video className="size-4 text-indigo-600" />;
+        return <Video className="size-4 text-primary/60" />;
       case "in-person":
-        return <Building className="size-4 text-green-600" />;
+        return <Building className="size-4 text-primary/60" />;
       case "hybrid":
         return (
           <div className="flex items-center gap-1">
-            <Video className="size-3 text-indigo-600" />
-            <Building className="size-3 text-green-600" />
+            <Video className="size-3 text-primary/60" />
+            <Building className="size-3 text-primary/60" />
           </div>
         );
       default:
@@ -114,7 +114,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
     };
 
     return (
-      <div className={`w-2 h-2 rounded-full ${colors[event.priority]} animate-pulse`} />
+      <div className={`w-2 h-2 rounded-full ${colors[event.priority]}`} />
     );
   };
 
@@ -128,13 +128,13 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border ${colors.border} ${colors.bg} backdrop-blur-sm hover:shadow-md transition-all duration-200 group ${
-        !isUpcoming ? 'opacity-60' : ''
-      } ${isCurrentEvent() ? 'ring-2 ring-secondary/40' : ''}`}
+      className={`relative overflow-hidden rounded-lg border border-primary/10 bg-white ${
+        !isUpcoming ? 'opacity-70' : ''
+      }`}
     >
       {/* Current event indicator */}
       {isCurrentEvent() && (
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-secondary to-accent" />
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary/20" />
       )}
 
       {/* Decorative accent bar */}
@@ -152,7 +152,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
               </span>
             </div>
             {isCurrentEvent() && (
-              <div className="px-2 py-0.5 bg-gradient-to-r from-secondary to-accent text-white text-[10px] font-bold rounded-full">
+              <div className="px-2 py-0.5 bg-primary text-white text-[10px] font-semibold rounded">
                 LIVE
               </div>
             )}
@@ -174,10 +174,10 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
         {/* Event title and type */}
         <div className="mb-2.5">
           <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-base font-bold text-primary leading-snug">
+            <h3 className="text-base font-semibold text-primary leading-snug">
               {event.title}
             </h3>
-            <span className={`px-2 py-0.5 rounded-md text-[10px] font-semibold ${colors.badge}`}>
+            <span className={`px-2 py-0.5 rounded text-[10px] font-medium bg-primary/5 text-primary/70`}>
               {event.type.toUpperCase()}
             </span>
           </div>
@@ -194,7 +194,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
           {(event.meetingType || event.location) && (
             <div className="flex items-center gap-2 flex-wrap">
               {event.meetingType && (
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-white/50 backdrop-blur-sm rounded-md">
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-white border border-primary/10 rounded">
                   {getMeetingTypeIcon()}
                   <span className="text-[10px] font-medium text-primary/70 capitalize">
                     {event.meetingType}
@@ -203,7 +203,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
               )}
               
               {event.location && (
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-white/50 backdrop-blur-sm rounded-md">
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-white border border-primary/10 rounded">
                   <MapPin className="w-3 h-3 text-primary/60" />
                   <span className="text-[10px] font-medium text-primary/70">
                     {event.location}
@@ -221,13 +221,13 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
                 {event.attendees.slice(0, 3).map((attendee, index) => (
                   <span
                     key={index}
-                    className="px-1.5 py-0.5 bg-white/40 backdrop-blur-sm rounded text-[10px] font-medium text-primary/70"
+                    className="px-1.5 py-0.5 bg-white border border-primary/10 rounded text-[10px] font-medium text-primary/70"
                   >
                     {attendee}
                   </span>
                 ))}
                 {event.attendees.length > 3 && (
-                  <span className="px-1.5 py-0.5 bg-white/40 backdrop-blur-sm rounded text-[10px] font-medium text-primary/70">
+                  <span className="px-1.5 py-0.5 bg-white border border-primary/10 rounded text-[10px] font-medium text-primary/70">
                     +{event.attendees.length - 3}
                   </span>
                 )}

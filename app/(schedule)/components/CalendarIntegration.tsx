@@ -31,83 +31,99 @@ export const CalendarIntegration: React.FC<CalendarIntegrationProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-gradient-to-br from-white/95 to-gray-50/80 backdrop-blur-lg rounded-2xl p-8 max-w-lg w-full shadow-2xl border border-gray-200/50 relative overflow-hidden">
-
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-gradient-to-br from-white/60 to-gray-50/60 shadow-sm">
-              <Calendar className="w-8 h-8 text-primary" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-primary">
-                Calendar Integration
-              </h2>
-              <p className="text-gray-600/70 text-sm">Connect with Google Calendar</p>
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+      <div className="relative max-w-lg w-full">
+        {/* Main container */}
+        <div className="relative bg-white rounded-xl border border-primary/10 shadow-md overflow-hidden">
+          {/* Header */}
+          <div className="relative p-5 pb-4 border-b border-primary/10">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg bg-white/80 border border-primary/10 flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-primary tracking-tight mb-0.5">
+                    Calendar Sync
+                  </h2>
+                  <p className="text-xs text-primary/60">Connect with Google Calendar</p>
+                </div>
+              </div>
+              <button
+                onClick={onClose}
+                className="p-2 rounded-md bg-white/80 border border-primary/10 hover:bg-white"
+                aria-label="Close"
+              >
+                <X className="w-4 h-4 text-primary/60" />
+              </button>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl bg-white/50 hover:bg-white/70 transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-600" />
-          </button>
-        </div>
 
         {/* Connection Status */}
-        <div className="mb-8">
+        <div className="px-7 pb-6">
           {isConnected ? (
-            <div className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-green-100 to-emerald-100 border border-green-200/50">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-              <div>
-                <p className="font-semibold text-green-800">Connected to Google Calendar</p>
-                <p className="text-green-700/70 text-sm">Your events are being synced automatically</p>
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-green-50 border border-green-200">
+              <div className="p-2 rounded-md bg-green-100 border border-green-200">
+                <CheckCircle className="w-5 h-5 text-green-700" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-green-800 text-sm">Connected Successfully</p>
+                <p className="text-green-700/80 text-xs">Your events are syncing automatically</p>
               </div>
             </div>
           ) : (
-            <div className="flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-gray-100 to-slate-100 border border-gray-200/50">
-              <AlertCircle className="w-6 h-6 text-gray-500" />
-              <div>
-                <p className="font-semibold text-gray-800">Not Connected</p>
-                <p className="text-gray-700/70 text-sm">Connect to see your Google Calendar events</p>
+            <div className="flex items-start gap-3 p-4 rounded-lg bg-white border border-primary/10">
+              <div className="p-2 rounded-md bg-primary/5 border border-primary/10">
+                <AlertCircle className="w-5 h-5 text-primary/60" />
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-primary text-sm">Not Connected</p>
+                <p className="text-primary/70 text-xs">Connect to sync your Google Calendar events</p>
               </div>
             </div>
           )}
         </div>
 
         {/* Features List */}
-        <div className="mb-8">
-          <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <Settings className="w-5 h-5" />
-            Features
-          </h3>
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 text-sm text-gray-700">
-              <div className="w-2 h-2 rounded-full bg-green-400"></div>
-              Sync events from your Google Calendar
+        <div className="px-7 pb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <Settings className="w-4 h-4 text-primary/70" />
+            <h3 className="font-bold text-primary text-xs uppercase tracking-wider">Features</h3>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white border border-primary/10">
+              <div className="flex-shrink-0 w-7 h-7 rounded-md bg-green-50 border border-green-200 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-green-600"></div>
+              </div>
+              <p className="text-sm text-primary/80">Sync events from your Google Calendar</p>
             </div>
-            <div className="flex items-center gap-3 text-sm text-gray-700">
-              <div className="w-2 h-2 rounded-full bg-blue-400"></div>
-              View all events in one beautiful interface
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white border border-primary/10">
+              <div className="flex-shrink-0 w-7 h-7 rounded-md bg-blue-50 border border-blue-200 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-600"></div>
+              </div>
+              <p className="text-sm text-primary/80">View all events in one unified interface</p>
             </div>
-            <div className="flex items-center gap-3 text-sm text-gray-700">
-              <div className="w-2 h-2 rounded-full bg-purple-400"></div>
-              Create new events directly from WorkBase
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white border border-primary/10">
+              <div className="flex-shrink-0 w-7 h-7 rounded-md bg-purple-50 border border-purple-200 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-600"></div>
+              </div>
+              <p className="text-sm text-primary/80">Create new events directly from WorkBase</p>
             </div>
-            <div className="flex items-center gap-3 text-sm text-gray-700">
-              <div className="w-2 h-2 rounded-full bg-pink-400"></div>
-              Receive gentle notifications for upcoming events
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-white border border-primary/10">
+              <div className="flex-shrink-0 w-7 h-7 rounded-md bg-orange-50 border border-orange-200 flex items-center justify-center">
+                <div className="w-1.5 h-1.5 rounded-full bg-orange-600"></div>
+              </div>
+              <p className="text-sm text-primary/80">Get notifications for upcoming events</p>
             </div>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3">
+        <div className="px-7 pb-7 flex gap-2">
           {isConnected ? (
             <button
               onClick={handleDisconnect}
-              className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-red-500 to-rose-600 hover:from-red-600 hover:to-rose-700 text-white font-semibold transition-all duration-200 hover:scale-105 shadow-lg"
+              className="flex-1 px-4 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold"
             >
               Disconnect
             </button>
@@ -115,34 +131,38 @@ export const CalendarIntegration: React.FC<CalendarIntegrationProps> = ({
             <button
               onClick={handleConnect}
               disabled={isConnecting}
-              className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold transition-all duration-200 hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
+              className="flex-1 px-4 py-3 bg-primary text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700" />
               {isConnecting ? (
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Connecting...
-                </div>
+                <span>Connecting...</span>
               ) : (
-                "Connect Google Calendar"
+                <span className="flex items-center justify-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Connect Google Calendar
+                </span>
               )}
             </button>
           )}
           <button
             onClick={onClose}
-            className="py-3 px-6 rounded-xl bg-gradient-to-r from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-700 font-semibold transition-all duration-200"
+            className="px-4 py-3 bg-white border border-primary/15 rounded-lg font-semibold text-primary"
           >
             Close
           </button>
         </div>
 
         {/* Privacy Note */}
-        <div className="mt-6 p-4 rounded-2xl bg-white/50 border border-gray-200/30">
-          <p className="text-xs text-gray-600/80 leading-relaxed">
-            🔒 Your privacy is important to us. We only access calendar events to display them in WorkBase. 
-            Your calendar data is never stored on our servers or shared with third parties.
-          </p>
+        <div className="px-7 pb-7">
+          <div className="p-4 rounded-lg bg-white border border-primary/10">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0 text-lg">🔒</div>
+              <p className="text-xs text-primary/70">
+                <span className="font-semibold text-primary">Your privacy matters.</span> We only access calendar events to display them in WorkBase. Your calendar data is never stored on our servers or shared with third parties.
+              </p>
+            </div>
+          </div>
         </div>
+      </div>
       </div>
     </div>
   );
