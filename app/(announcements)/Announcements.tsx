@@ -7,6 +7,7 @@ import { AnnouncementCard } from "./components/AnnouncementCard";
 import { AnnouncementForm } from "./components/AnnouncementForm";
 import { Plus } from "lucide-react";
 import { useState } from "react";
+import { Button } from "@/presentation/components/ui/button";
 
 const Announcements = () => {
   const [announcements] = useAtom(announcementsAtom);
@@ -17,17 +18,17 @@ const Announcements = () => {
   );
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-br from-yellow-50 via-orange-50/30 to-red-50/20 p-6">
+    <div className="flex flex-col h-full p-4 bg-stone-50">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-primary">What&apos;s New</h1>
-        <button
+      <div className="flex justify-between items-center mb-4">
+        <h1 className="text-lg font-bold text-primary">What&apos;s New</h1>
+        <Button
           onClick={() => setShowForm(!showForm)}
-          className="bg-secondary hover:bg-accent text-white px-4 py-2 rounded-md flex items-center gap-2 text-sm font-medium transition-colors"
+          className="bg-secondary hover:bg-accent text-white px-3 py-2 rounded-md text-sm"
         >
-          <Plus className="size-4" />
+          <Plus className="size-4 mr-2" />
           New Announcement
-        </button>
+        </Button>
       </div>
 
       {/* Add New Announcement Form */}
@@ -41,7 +42,7 @@ const Announcements = () => {
       <div className="flex-1 overflow-y-auto">
         {sortedAnnouncements.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="bg-white rounded-lg p-8 shadow-sm border">
+            <div className="bg-white rounded-lg p-8 shadow-sm border border-primary/10">
               <div className="text-muted-foreground mb-4">
                 <svg
                   className="w-16 h-16 mx-auto mb-4 text-gray-300"
@@ -66,7 +67,7 @@ const Announcements = () => {
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {sortedAnnouncements.map((announcement) => (
               <AnnouncementCard
                 key={announcement.id}

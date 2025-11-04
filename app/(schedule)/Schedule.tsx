@@ -42,6 +42,7 @@ const mockCalendarEvents = [
 ];
 import { Plus, Calendar, Clock, Settings } from "lucide-react";
 import { CalendarIntegration } from "./components/CalendarIntegration";
+import { Button } from "@/presentation/components/ui/button";
 
 const Schedule = () => {
   const [events] = useAtom(eventsAtom);
@@ -113,41 +114,41 @@ const Schedule = () => {
   );
 
   return (
-    <div className="flex flex-col h-full relative overflow-hidden">
+    <div className="flex flex-col h-full p-4 bg-stone-50">
       {/* Header */}
-      <div className="relative bg-white/70 backdrop-blur-xl border-b border-primary/10 shadow-sm">
-        <div className="px-5 py-3">
-          <div className="flex justify-between items-center">
+      <div className="border-b border-primary/10">
+        <div className="py-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             {/* Left section - Title and date */}
-            <div className="flex items-center gap-3.5">
-              <div className="w-10 h-10 rounded-xl bg-white/70 border border-primary/10 flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-primary" />
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-primary/10 bg-white">
+                <Calendar className="w-5 h-5 text-secondary" />
               </div>
               <div>
-                <h1 className="text-lg font-bold text-primary tracking-tight">My Day</h1>
-                <div className="flex items-center gap-2 text-[11px] text-primary/60 font-medium">
+                <h1 className="text-lg font-bold text-primary">My Day</h1>
+                <div className="flex items-center gap-2 text-xs text-primary/60">
                   <span>{formatDate(today)}</span>
-                  <span className="w-1 h-1 rounded-full bg-primary/20" />
+                  <span className="h-1 w-1 rounded-full bg-primary/20" />
                   <span className="tabular-nums">{formatCurrentTime(currentTime)}</span>
                 </div>
               </div>
             </div>
-            
+
             {/* Right section - Action buttons */}
-            <div className="flex gap-2">
-              <button
+            <div className="flex items-center gap-2">
+              <Button
                 onClick={() => setShowCalendarIntegration(!showCalendarIntegration)}
-                className={`px-3.5 py-2 rounded-lg flex items-center gap-2 text-xs font-semibold border transition-colors ${
-                  isCalendarConnected 
-                    ? 'bg-green-600 text-white border-green-600 hover:bg-green-700' 
-                    : 'bg-white/80 text-secondary border-primary/15 hover:bg-white'
+                className={`flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-medium ${
+                  isCalendarConnected
+                    ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                    : "bg-white text-secondary border-primary/15 hover:bg-white"
                 }`}
               >
-                <Settings className="w-4 h-4" />
-                <span>{isCalendarConnected ? 'Connected' : 'Connect'}</span>
-              </button>
-              
-              <button
+                <Settings className={`w-4 h-4 ${isCalendarConnected ? "text-white" : "text-secondary"}`} />
+                <span>{isCalendarConnected ? "Connected" : "Connect"}</span>
+              </Button>
+
+              <Button
                 onClick={() => {
                   if (!showForm && !isFormAnimating) {
                     setIsFormAnimating(true);
@@ -160,11 +161,13 @@ const Schedule = () => {
                   }
                 }}
                 disabled={isFormAnimating}
-                className="bg-primary text-white px-4 py-2 rounded-lg flex items-center gap-2 text-xs font-semibold border border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-md bg-secondary hover:bg-accent px-4 py-2 text-xs font-medium text-white disabled:cursor-not-allowed disabled:opacity-70"
               >
-                <Plus className="w-4 h-4" />
-                <span>Add Event</span>
-              </button>
+                <div className="flex items-center gap-2">
+                  <Plus className="h-4 w-4" />
+                  <span>Add Event</span>
+                </div>
+              </Button>
             </div>
           </div>
         </div>
@@ -188,99 +191,99 @@ const Schedule = () => {
       )}
 
       {/* Daily Overview */}
-      <div className="relative px-5 py-4">
-        <div className="relative">
-          {/* Main card */}
-          <div className="relative bg-white/80 backdrop-blur-md rounded-xl p-4 border border-primary/10 shadow-sm">
-            <div className="flex items-center justify-between">
+      <div className="px-4 py-4">
+        <div className="rounded-lg border border-primary/10 bg-white p-4">
+          <div className="flex items-center justify-between gap-4">
               {/* Left section */}
               <div className="flex items-start gap-3.5">
-                <div className="w-12 h-12 rounded-xl bg-white/70 border border-primary/10 flex items-center justify-center">
-                  <div className="text-xl">☀️</div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/10 bg-white">
+                  <div className="text-2xl">☀️</div>
                 </div>
                 <div>
-                  <h2 className="text-base font-bold text-primary tracking-tight">
+                  <h2 className="text-base font-bold text-primary">
                     Good {getTimeOfDay()}!
                   </h2>
-                  <div className="flex items-center gap-2 text-xs text-primary/70">
-                    <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-white/70 border border-primary/10 rounded-md text-primary">
-                      <Clock className="w-3 h-3" />
+                  <div className="mt-1 flex items-center gap-2 text-xs text-primary/70">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/10 bg-white px-2 py-0.5 text-primary">
+                      <Clock className="h-3 w-3" />
                       {upcomingEvents.length}
                     </span>
-                    <span>upcoming</span>
+                    <span className="uppercase tracking-wider">Upcoming</span>
                   </div>
                 </div>
               </div>
-              
+
               {/* Right section - Stats */}
               <div className="text-center">
-                <div className="w-14 h-14 rounded-xl bg-white/70 border border-primary/10 flex items-center justify-center">
-                  <span className="text-xl font-bold text-primary">
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-primary/10 bg-white">
+                  <span className="text-lg font-bold text-primary">
                     {todayEvents.length + googleEvents.length}
                   </span>
                 </div>
-                <div className="text-[10px] text-primary/50 font-semibold uppercase tracking-wider mt-1.5">Total Events</div>
+                <div className="mt-2 text-[10px] font-semibold uppercase tracking-widest text-primary/50">
+                  Total Events
+                </div>
+              </div>
+          </div>
+          {todayEvents.length > 0 && (
+            <div className="mt-4 border-t border-primary/10 pt-3">
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-widest text-primary/60">
+                  Daily Progress
+                </span>
+                <span className="text-xs text-primary/80">
+                  {completedEvents.length}/{todayEvents.length}
+                </span>
+              </div>
+              <div className="h-2 overflow-hidden rounded-full bg-primary/10">
+                <div
+                  className="h-full rounded-full bg-secondary transition-all"
+                  style={{ width: `${(completedEvents.length / todayEvents.length) * 100}%` }}
+                />
               </div>
             </div>
-            
-            {/* Progress indicator */}
-            {todayEvents.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-primary/10">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-xs font-semibold text-primary/60">Daily Progress</span>
-                  <span className="text-xs font-semibold text-primary/80">
-                    {completedEvents.length}/{todayEvents.length}
-                  </span>
-                </div>
-                <div className="h-1.5 bg-primary/5 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-primary rounded-full"
-                    style={{ width: `${(completedEvents.length / todayEvents.length) * 100}%` }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
 
       {/* Timeline */}
-      <div className="relative flex-1 overflow-y-auto px-5 scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent">
+      <div className="flex-1 overflow-y-auto px-4 pb-4">
         {(todayEvents.length === 0 && googleEvents.length === 0) ? (
-          <div className="flex flex-col items-center justify-center h-full text-center py-10">
+          <div className="flex h-full flex-col items-center justify-center py-10 text-center">
             <div className="max-w-sm">
-              {/* Main card */}
-              <div className="bg-white/80 backdrop-blur-md rounded-xl p-8 border border-primary/10 shadow-sm">
-                {/* Icon container */}
+              <div className="rounded-lg border border-primary/10 bg-white p-6">
                 <div className="mx-auto mb-4 w-fit">
-                  <div className="p-6 rounded-xl bg-white/70 border border-primary/10">
-                    <Calendar className="w-14 h-14 text-primary/50" />
+                  <div className="flex items-center justify-center rounded-xl border border-primary/10 bg-white p-4">
+                    <Calendar className="h-10 w-10 text-primary/50" />
                   </div>
                 </div>
-                
-                {/* Text content */}
-                <h3 className="text-lg font-bold text-primary mb-2 tracking-tight">
-                  Free Day! 🌅
-                </h3>
-                <p className="text-sm text-primary/60 leading-relaxed">
-                  No events scheduled today. Perfect time for deep work and focus.
+                <h3 className="mb-2 text-lg font-semibold text-primary">Free Day! 🌅</h3>
+                <p className="text-sm leading-relaxed text-primary/65">
+                  No events scheduled today. Lean into deep focus or take a well-deserved break.
                 </p>
               </div>
             </div>
           </div>
         ) : (
-          <div className="space-y-4 pb-4">
+          <div className="space-y-4 pb-2">
             {/* Upcoming Events */}
             {upcomingEvents.length > 0 && (
               <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-xs font-semibold text-primary/70">Upcoming</div>
-                  <div className="h-px flex-1 ml-3 bg-primary/10" />
+                <div className="mb-2 flex items-center gap-3">
+                  <span className="rounded-full border border-primary/15 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary/70">
+                    Upcoming
+                  </span>
+                  <div className="h-px flex-1 bg-primary/10" />
                 </div>
-                
+
                 <div className="space-y-3">
-                  {upcomingEvents.map((event) => (
-                    <EventCard key={event.id} event={event} isUpcoming={true} currentTime={currentTime} />
+                  {upcomingEvents.map((event, index) => (
+                    <div
+                      key={event.id}
+                      className=""
+                    >
+                      <EventCard event={event} isUpcoming={true} currentTime={currentTime} />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -288,15 +291,22 @@ const Schedule = () => {
 
             {/* Completed Events */}
             {completedEvents.length > 0 && (
-              <div className="mt-5">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="text-xs font-semibold text-primary/70">Completed</div>
-                  <div className="h-px flex-1 ml-3 bg-primary/10" />
+              <div className="mt-4">
+                <div className="mb-2 flex items-center gap-3">
+                  <span className="rounded-full border border-primary/15 bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-primary/60">
+                    Completed
+                  </span>
+                  <div className="h-px flex-1 bg-primary/10" />
                 </div>
-                
+
                 <div className="space-y-3">
-                  {completedEvents.map((event) => (
-                    <EventCard key={event.id} event={event} isUpcoming={false} currentTime={currentTime} />
+                  {completedEvents.map((event, index) => (
+                    <div
+                      key={event.id}
+                      className=""
+                    >
+                      <EventCard event={event} isUpcoming={false} currentTime={currentTime} />
+                    </div>
                   ))}
                 </div>
               </div>

@@ -3,6 +3,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, Minimize2, MessageCircle, AlertCircle, RotateCcw } from "lucide-react";
+import { Button } from "@/presentation/components/ui/button";
 import { aiApi } from "@/infrastructure/lib/api";
 
 interface Message {
@@ -122,12 +123,13 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
   if (isMinimized) {
     return (
       <div className="fixed bottom-6 right-6 z-50">
-        <button
+        <Button
           onClick={onToggleMinimize}
-          className="w-14 h-14 rounded-full bg-gradient-to-br from-secondary to-accent text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 flex items-center justify-center"
+          size="icon"
+          className="w-14 h-14 rounded-full bg-gradient-to-br from-secondary to-accent text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
         >
           <Bot className="w-6 h-6" />
-        </button>
+        </Button>
       </div>
     );
   }
@@ -147,20 +149,24 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
             </div>
           </div>
           <div className="flex gap-1.5">
-            <button
+            <Button
               onClick={clearConversation}
+              variant="ghost"
+              size="icon"
               className="p-2 rounded-lg hover:bg-white/70 transition-colors"
               title="Clear conversation"
             >
               <RotateCcw className="w-4 h-4 text-primary/60" />
-            </button>
+            </Button>
             {onToggleMinimize && (
-              <button
+              <Button
                 onClick={onToggleMinimize}
+                variant="ghost"
+                size="icon"
                 className="p-2 rounded-lg hover:bg-white/70 transition-colors"
               >
                 <Minimize2 className="w-4 h-4 text-primary/60" />
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -171,12 +177,14 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
         <div className="mx-4 mt-3 p-2.5 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-sm">
           <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
           <p className="text-red-700 text-xs flex-1">{error}</p>
-          <button
+          <Button
             onClick={() => setError(null)}
+            variant="ghost"
+            size="icon"
             className="text-red-600 hover:text-red-800 text-lg leading-none"
           >
             ×
-          </button>
+          </Button>
         </div>
       )}
 
@@ -254,13 +262,13 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
             rows={1}
             disabled={isLoading}
           />
-          <button
+          <Button
             onClick={handleSendMessage}
             disabled={!input.trim() || isLoading || !sessionId}
-            className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-secondary to-accent hover:from-accent hover:to-secondary text-white font-medium transition-all duration-200 hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
+            className="px-4 py-2.5 rounded-lg bg-secondary hover:bg-accent text-white font-medium transition-all duration-200 hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center"
           >
             <Send className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
       </div>
     </div>

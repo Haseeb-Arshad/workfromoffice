@@ -25,65 +25,38 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
     return `${formatTime(event.startTime)} - ${formatTime(event.endTime)}`;
   };
 
-  const getEventTypeColor = () => {
-    switch (event.type) {
-      case "meeting":
-        return {
-          bg: "bg-blue-50/60",
-          border: "border-blue-200/50",
-          accent: "bg-blue-500",
-          icon: "text-blue-600",
-          badge: "bg-blue-100 text-blue-700"
-        };
-      case "presentation":
-        return {
-          bg: "bg-purple-50/60", 
-          border: "border-purple-200/50",
-          accent: "bg-purple-500",
-          icon: "text-purple-600",
-          badge: "bg-purple-100 text-purple-700"
-        };
-      case "workshop":
-        return {
-          bg: "bg-green-50/60",
-          border: "border-green-200/50", 
-          accent: "bg-green-500",
-          icon: "text-green-600",
-          badge: "bg-green-100 text-green-700"
-        };
-      case "break":
-        return {
-          bg: "bg-orange-50/60",
-          border: "border-orange-200/50",
-          accent: "bg-orange-500",
-          icon: "text-orange-600",
-          badge: "bg-orange-100 text-orange-700"
-        };
-      case "call":
-        return {
-          bg: "bg-cyan-50/60",
-          border: "border-cyan-200/50",
-          accent: "bg-cyan-500",
-          icon: "text-cyan-600",
-          badge: "bg-cyan-100 text-cyan-700"
-        };
-      case "deadline":
-        return {
-          bg: "bg-red-50/60",
-          border: "border-red-200/50",
-          accent: "bg-red-500",
-          icon: "text-red-600",
-          badge: "bg-red-100 text-red-700"
-        };
-      default:
-        return {
-          bg: "bg-white/70",
-          border: "border-primary/10",
-          accent: "bg-gray-500",
-          icon: "text-gray-600",
-          badge: "bg-gray-100 text-gray-700"
-        };
-    }
+  const getEventTypeStyles = () => {
+    const palette: Record<ScheduleEvent["type"], {
+      gradient: string;
+      chip: string;
+    }> = {
+      meeting: {
+        gradient: "from-amber-200/70 via-orange-100/60 to-white/60",
+        chip: "bg-orange-200/60 text-[#8F4C24]",
+      },
+      presentation: {
+        gradient: "from-rose-200/65 via-rose-100/55 to-white/60",
+        chip: "bg-rose-200/60 text-[#9F3E42]",
+      },
+      workshop: {
+        gradient: "from-emerald-200/65 via-emerald-100/55 to-white/60",
+        chip: "bg-emerald-200/60 text-[#1B7A52]",
+      },
+      break: {
+        gradient: "from-orange-200/70 via-amber-100/60 to-white/60",
+        chip: "bg-amber-200/60 text-[#A04E1F]",
+      },
+      call: {
+        gradient: "from-sky-200/65 via-sky-100/55 to-white/60",
+        chip: "bg-sky-200/60 text-[#0E6C8E]",
+      },
+      deadline: {
+        gradient: "from-red-200/65 via-rose-100/55 to-white/60",
+        chip: "bg-red-200/60 text-[#9E1C30]",
+      },
+    };
+
+    return palette[event.type] ?? palette.meeting;
   };
 
   const getMeetingTypeIcon = () => {
@@ -124,110 +97,95 @@ export const EventCard: React.FC<EventCardProps> = ({ event, isUpcoming, current
     return currentTime >= start && currentTime <= end;
   };
 
-  const colors = getEventTypeColor();
+  const styles = getEventTypeStyles();
 
   return (
     <div
-      className={`relative overflow-hidden rounded-lg border border-primary/10 bg-white ${
-        !isUpcoming ? 'opacity-70' : ''
-      }`}
+      className={`group relative overflow-hidden rounded-2xl border border-primary/12 bg-white/85 p-4 shadow-[0_12px_32px_rgba(47,32,16,0.1)] backdrop-blur-xl transition-all duration-300 ${
+        !isUpcoming ? "opacity-75" : "opacity-95"
+      } hover:-translate-y-1 hover:shadow-[0_22px_56px_rgba(47,32,16,0.18)]`}
     >
-      {/* Current event indicator */}
+      <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${styles.gradient} opacity-40`} />
+      <div className="pointer-events-none absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-secondary/50 via-secondary/20 to-transparent" />
       {isCurrentEvent() && (
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-primary/20" />
+        <div className="pointer-events-none absolute inset-x-4 top-0 h-1 rounded-full bg-secondary/50 shadow-[0_6px_18px_rgba(111,64,24,0.35)]" />
       )}
 
-      {/* Decorative accent bar */}
-      <div className={`absolute left-0 top-0 w-1 h-full ${colors.accent}`} />
-      
-      {/* Main content */}
-      <div className="relative p-3 pl-4">
+      <div className="relative z-[1] space-y-3">
         {/* Header with time and actions */}
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-primary/60" />
-              <span className="text-sm font-semibold text-primary">
-                {formatTimeRange()}
-              </span>
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2 text-primary">
+            <div className="flex items-center gap-1.5 text-sm font-semibold">
+              <Clock className="h-3.5 w-3.5 text-primary/60" />
+              <span>{formatTimeRange()}</span>
             </div>
             {isCurrentEvent() && (
-              <div className="px-2 py-0.5 bg-primary text-white text-[10px] font-semibold rounded">
-                LIVE
-              </div>
+              <span className="rounded-full bg-secondary/90 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-white shadow-[0_8px_20px_rgba(111,64,24,0.35)]">
+                Live
+              </span>
             )}
-            {event.isRecurring && (
-              <Repeat className="w-3 h-3 text-primary/40" />
-            )}
+            {event.isRecurring && <Repeat className="h-3 w-3 text-primary/40" />}
             {getPriorityIndicator()}
           </div>
 
           <button
             onClick={() => removeEvent(event.id)}
-            className="text-primary/30 hover:text-red-500 transition-colors p-1 rounded hover:bg-white/50 opacity-0 group-hover:opacity-100"
+            className="rounded-lg border border-transparent p-1.5 text-primary/30 opacity-0 transition-all duration-200 hover:border-red-200/80 hover:bg-white/70 hover:text-red-500 focus-visible:border-red-200/80 focus-visible:text-red-500 group-hover:opacity-100"
             title="Remove event"
           >
-            <X className="w-3.5 h-3.5" />
+            <X className="h-3.5 w-3.5" />
           </button>
         </div>
 
         {/* Event title and type */}
-        <div className="mb-2.5">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="text-base font-semibold text-primary leading-snug">
-              {event.title}
-            </h3>
-            <span className={`px-2 py-0.5 rounded text-[10px] font-medium bg-primary/5 text-primary/70`}>
-              {event.type.toUpperCase()}
+        <div>
+          <div className="mb-1 flex flex-wrap items-center gap-2">
+            <h3 className="text-base font-semibold leading-snug text-primary">{event.title}</h3>
+            <span
+              className={`rounded-full border border-primary/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${styles.chip}`}
+            >
+              {event.type}
             </span>
           </div>
           {event.description && (
-            <p className="text-xs text-primary/70 leading-relaxed line-clamp-2">
-              {event.description}
-            </p>
+            <p className="text-xs leading-relaxed text-primary/70">{event.description}</p>
           )}
         </div>
 
         {/* Event details */}
-        <div className="space-y-2">
-          {/* Meeting type and location */}
+        <div className="space-y-2.5">
           {(event.meetingType || event.location) && (
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex flex-wrap items-center gap-2">
               {event.meetingType && (
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-white border border-primary/10 rounded">
+                <div className="flex items-center gap-1.5 rounded-full border border-primary/10 bg-white/70 px-3 py-1 text-[11px] font-semibold text-primary/70">
                   {getMeetingTypeIcon()}
-                  <span className="text-[10px] font-medium text-primary/70 capitalize">
-                    {event.meetingType}
-                  </span>
+                  <span className="capitalize">{event.meetingType}</span>
                 </div>
               )}
-              
+
               {event.location && (
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-white border border-primary/10 rounded">
-                  <MapPin className="w-3 h-3 text-primary/60" />
-                  <span className="text-[10px] font-medium text-primary/70">
-                    {event.location}
-                  </span>
+                <div className="flex items-center gap-1.5 rounded-full border border-primary/10 bg-white/70 px-3 py-1 text-[11px] font-semibold text-primary/70">
+                  <MapPin className="h-3 w-3 text-primary/50" />
+                  <span>{event.location}</span>
                 </div>
               )}
             </div>
           )}
 
-          {/* Attendees */}
           {event.attendees && event.attendees.length > 0 && (
-            <div className="flex items-center gap-1.5">
-              <Users className="w-3 h-3 text-primary/50" />
+            <div className="flex items-center gap-1.5 text-primary/60">
+              <Users className="h-3 w-3 text-primary/50" />
               <div className="flex flex-wrap gap-1">
                 {event.attendees.slice(0, 3).map((attendee, index) => (
                   <span
                     key={index}
-                    className="px-1.5 py-0.5 bg-white border border-primary/10 rounded text-[10px] font-medium text-primary/70"
+                    className="rounded-full border border-primary/10 bg-white/75 px-2 py-0.5 text-[10px] font-semibold text-primary/70"
                   >
                     {attendee}
                   </span>
                 ))}
                 {event.attendees.length > 3 && (
-                  <span className="px-1.5 py-0.5 bg-white border border-primary/10 rounded text-[10px] font-medium text-primary/70">
+                  <span className="rounded-full border border-primary/10 bg-white/75 px-2 py-0.5 text-[10px] font-semibold text-primary/70">
                     +{event.attendees.length - 3}
                   </span>
                 )}

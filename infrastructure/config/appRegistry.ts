@@ -14,6 +14,7 @@ import SessionLogApp from "@/app/(session-log)/SessionLogApp";
 import Announcements from "@/app/(announcements)/Announcements";
 import { Schedule } from "@/app/(schedule)/Schedule";
 import AiAssistant from "@/app/(ai-assistant)/AiAssistant";
+import StickyNotes from "@/app/(sticky-notes)/StickyNotes";
 
 interface AppRegistryEntry {
   name: string; // The display name of the app
@@ -139,6 +140,13 @@ export const appRegistry: Record<string, AppRegistryEntry> = {
     defaultSize: { width: 420, height: 600 },
     minSize: { width: 380, height: 500 },
     component: AiAssistant,
+  },
+  stickyNotes: {
+    name: "Sticky Notes",
+    src: "/icons/notepad.png",
+    defaultSize: { width: 520, height: 520 },
+    minSize: { width: 380, height: 380 },
+    component: StickyNotes,
   },
 };
 
