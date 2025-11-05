@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Plus, X, Calendar, Clock, MapPin, Users, Repeat, AlertCircle } from "lucide-react";
+import { Plus, X, Calendar, Clock, MapPin, Users, Repeat, AlertCircle, Flame, Zap, Leaf } from "lucide-react";
 import { useAtom } from "jotai";
 import { addEventAtom, ScheduleEvent, EventType, MeetingType, Priority } from "@/application/atoms/scheduleAtom";
 import { Button } from "@/presentation/components/ui/button";
@@ -64,13 +64,10 @@ export const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const getPriorityEmoji = (priority: Priority) => {
-    const emojis = {
-      high: "🔥",
-      medium: "⚡",
-      low: "🌱"
-    };
-    return emojis[priority];
+  const PriorityIcon: React.FC<{ p: Priority }> = ({ p }) => {
+    if (p === "high") return <Flame className="size-4" />;
+    if (p === "medium") return <Zap className="size-4" />;
+    return <Leaf className="size-4" />;
   };
 
   const baseInputClasses =
@@ -284,7 +281,7 @@ export const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
                     onClick={() => handleChange("priority", priority)}
                     className={`${buildSelectionButtonClass(formData.priority === priority)} flex items-center justify-center gap-2`}
                   >
-                    <span className="text-base">{getPriorityEmoji(priority)}</span>
+                    <PriorityIcon p={priority} />
                     <span>{priority}</span>
                   </button>
                 ))}

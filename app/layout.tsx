@@ -3,6 +3,7 @@ import { Itim } from "next/font/google";
 import "@/presentation/styles/globals.css";
 import JotaiProvider from "@/providers/JotaiProvider";
 import { GoogleAnalytics } from "@next/third-parties/google";
+import StickyNotesWall from "@/presentation/components/wall/StickyNotesWall";
 
 const font = Itim({ weight: "400", subsets: ["latin"] });
 
@@ -46,7 +47,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={font.className}>
-        <JotaiProvider>{children}</JotaiProvider>
+        <JotaiProvider>
+          {/* Background wall elements */}
+          <StickyNotesWall />
+          {children}
+        </JotaiProvider>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>
     </html>
