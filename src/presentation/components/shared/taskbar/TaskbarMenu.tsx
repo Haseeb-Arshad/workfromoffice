@@ -132,7 +132,7 @@ export const TaskbarMenu = () => {
           </MenubarItem>
           <MenubarItem
             inset
-            onSelect={() => openUrl("https://github.com/ekmigasari/wfcOS.git")}
+            onSelect={() => openUrl("https://github.com/Haseeb-Arshad/workfromoffice")}
           >
             Github<MenubarShortcut>repository</MenubarShortcut>
           </MenubarItem>

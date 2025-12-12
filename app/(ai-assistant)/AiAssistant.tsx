@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Send, Bot, User, Minimize2, MessageCircle, AlertCircle, RotateCcw } from "lucide-react";
+import { Send, Bot, User, Minimize2, AlertCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/presentation/components/ui/button";
 import { aiApi } from "@/infrastructure/lib/api";
 
@@ -66,19 +66,19 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
     try {
       // Call backend API
       const response = await aiApi.chat(messageContent, sessionId);
-      
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
         content: response.data.message,
         timestamp: new Date(),
       };
-      
+
       setMessages(prev => [...prev, aiResponse]);
     } catch (error) {
       console.error('AI Chat Error:', error);
       setError(error instanceof Error ? error.message : 'Failed to get AI response');
-      
+
       // Add error message to chat
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
@@ -86,7 +86,7 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
         content: "I'm sorry, I'm having trouble connecting to my AI service right now. Please make sure the backend server is running and try again.",
         timestamp: new Date(),
       };
-      
+
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -95,7 +95,7 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
 
   const clearConversation = async () => {
     if (!sessionId) return;
-    
+
     try {
       await aiApi.clearConversation(sessionId);
       setMessages([
@@ -202,20 +202,18 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
                 </div>
               </div>
             )}
-            
+
             <div
-              className={`max-w-[75%] px-3 py-2.5 rounded-xl text-sm ${
-                message.role === "user"
+              className={`max-w-[75%] px-3 py-2.5 rounded-xl text-sm ${message.role === "user"
                   ? "bg-gradient-to-br from-secondary to-accent text-white shadow-sm"
                   : "bg-white/70 backdrop-blur-sm border border-primary/10 text-primary"
-              }`}
+                }`}
             >
               <p className="leading-relaxed whitespace-pre-wrap">
                 {message.content}
               </p>
-              <div className={`text-[10px] mt-1.5 ${
-                message.role === "user" ? "text-white/60" : "text-primary/40"
-              }`}>
+              <div className={`text-[10px] mt-1.5 ${message.role === "user" ? "text-white/60" : "text-primary/40"
+                }`}>
                 {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </div>
             </div>
@@ -240,13 +238,13 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
             <div className="px-3 py-2.5 rounded-xl bg-white/70 backdrop-blur-sm border border-primary/10">
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-secondary/70 animate-bounce"></div>
-                <div className="w-1.5 h-1.5 rounded-full bg-secondary/70 animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                <div className="w-1.5 h-1.5 rounded-full bg-secondary/70 animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-secondary/70 animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-secondary/70 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
               </div>
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
