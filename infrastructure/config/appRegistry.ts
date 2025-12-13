@@ -26,29 +26,7 @@ interface AppRegistryEntry {
   hidden?: boolean; // Flag to hide app from desktop icons
 }
 
-// Settings module specific entries
-export interface SettingsEntry {
-  id: string;
-  name: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  component: React.ComponentType<any>;
-  icon: string;
-}
-
-export const settingsRegistry: SettingsEntry[] = [
-  {
-    id: "background",
-    name: "Background",
-    component: BackgroundChanger,
-    icon: "/icons/wallpaper.png",
-  },
-  {
-    id: "sound",
-    name: "Sound",
-    component: SoundChanger,
-    icon: "/icons/volume.png",
-  },
-];
+// Settings module specific entries moved to settingsRegistry.ts
 
 export const appRegistry: Record<string, AppRegistryEntry> = {
   // Using appId as the key (e.g., 'pomodoro'), and name for display

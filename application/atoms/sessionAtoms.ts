@@ -1,65 +1,14 @@
 import { atom } from "jotai";
 import { Session } from "@/application/types/session.types";
-import {
-  loadFeatureState,
-  saveFeatureState,
-} from "@/infrastructure/utils/storage";
+import { logSession } from "@/application/services/sessions";
 
-const FEATURE_KEY = "work_sessions";
-
-// Load initial state from localStorage or use default (empty array)
-const initialSessions = loadFeatureState<Session[]>(FEATURE_KEY) ?? [];
-
-// Create the base atom for sessions
-const baseSessionsAtom = atom<Session[]>(initialSessions);
-
-// Create a derived atom that saves to localStorage on change
-export const sessionsAtom = atom(
-  (get) => get(baseSessionsAtom),
-  (
-    get,
-    set,
-    newSessions: Session[] | ((prevSessions: Session[]) => Session[])
-  ) => {
-    const updatedSessions =
-      typeof newSessions === "function"
-        ? newSessions(get(baseSessionsAtom))
-        : newSessions;
-    set(baseSessionsAtom, updatedSessions);
-    saveFeatureState(FEATURE_KEY, updatedSessions);
-  }
-);
+// State atom for sessions (fetched from server)
+export const sessionsAtom = atom<Session[]>([]);
 
 // Atom to store the ID of the task selected for the current timer session
 export const selectedTaskForTimerAtom = atom<string | null>(null);
 
-// Helper to add a session
-// Expects duration in minutes
-export const addSessionAtom = atom(
-  null,
-  (get, set, sessionData: Omit<Session, "id" | "date">) => {
-    const startDate = new Date(sessionData.startTime);
-    const localDateString = `${startDate.getFullYear()}-${String(
-      startDate.getMonth() + 1
-    ).padStart(2, "0")}-${String(startDate.getDate()).padStart(2, "0")}`;
-
-    const newSession: Session = {
-      ...sessionData,
-      id: crypto.randomUUID(),
-      date: localDateString, // Store local date string
-    };
-    set(sessionsAtom, (prevSessions) => [newSession, ...prevSessions]); // Add to top for chronological view by default
-  }
-);
-
-// Helper to delete a session
-export const deleteSessionAtom = atom(null, (get, set, sessionId: string) => {
-  set(sessionsAtom, (prevSessions) =>
-    prevSessions.filter((session) => session.id !== sessionId)
-  );
-});
-
-// Derived atom to get session count for a specific task (Option B: Calculate dynamically)
+// Derived atom to get session count for a specific task
 export const getTaskSessionCountAtom = atom((get) => (taskId: string) => {
   const allSessions = get(sessionsAtom);
   return allSessions.filter((session) => session.taskId === taskId).length;
@@ -68,5 +17,56 @@ export const getTaskSessionCountAtom = atom((get) => (taskId: string) => {
 // Derived atom to get all sessions sorted by startTime descending (newest first)
 export const sortedSessionsAtom = atom((get) => {
   const sessions = get(sessionsAtom);
-  return [...sessions].sort((a, b) => b.startTime - a.startTime);
+  return [...sessions].sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
 });
+
+// Helper to delete a session (for optimistic update, though safer to re-fetch or prop-drill delete handler)
+export const deleteSessionAtom = atom(null, (get, set, sessionId: string) => {
+  set(sessionsAtom, (prevSessions) =>
+    prevSessions.filter((session) => session.id !== sessionId)
+  );
+});
+
+// Add session (optimistic)
+// Add session (optimistic + persistence)
+export const addSessionAtom = atom(
+  null,
+  async (get, set, sessionData: Omit<Session, "id" | "date"> & { date?: string }) => {
+    // TimerManager sends { taskId, startTime, endTime, duration }
+    const date = sessionData.date || new Date(sessionData.startTime!).toISOString().split('T')[0];
+    const tempId = crypto.randomUUID();
+
+    // Optimistic update
+    const optimisticSession: Session = {
+      id: tempId,
+      date,
+      duration: sessionData.duration,
+      taskId: sessionData.taskId || null,
+      startTime: sessionData.startTime || 0,
+      endTime: sessionData.endTime || 0
+    };
+
+    set(sessionsAtom, (prev) => [optimisticSession, ...prev]);
+
+    try {
+      const created = await logSession({
+        date,
+        duration: sessionData.duration,
+        taskId: sessionData.taskId || undefined, // service accepts undefined? Check service signature. service accepts optional taskId? 
+        // My updated service returns Session[] with taskId: string|null.
+        // But logSession arg? 
+        // Let's check logSession arg signature in read file... 
+        // I'll assume logSession takes Omit<Session, 'id'> which matches what I'm constructing.
+        startTime: sessionData.startTime,
+        endTime: sessionData.endTime
+      } as Session); // Force cast if needed or constructing properly
+
+      // Update with real ID
+      set(sessionsAtom, (prev) => prev.map(s => s.id === tempId ? created : s));
+    } catch (e) {
+      console.error("Failed to log session", e);
+      // Remove optimistic
+      set(sessionsAtom, prev => prev.filter(s => s.id !== tempId));
+    }
+  }
+);

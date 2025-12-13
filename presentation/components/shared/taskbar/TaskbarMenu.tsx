@@ -84,7 +84,7 @@ export const TaskbarMenu = () => {
             User Settings
           </MenubarItem>
           <MenubarSeparator />
-          <MenubarItem disabled>
+          <MenubarItem onSelect={() => window.location.href = '/login'}>
             <Lock className="w-4 h-4 mr-2" />
             Login
           </MenubarItem>

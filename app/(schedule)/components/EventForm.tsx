@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Plus, X, Calendar, Clock, MapPin, Users, Repeat, AlertCircle } from "lucide-react";
-import { useAtom } from "jotai";
-import { addEventAtom, ScheduleEvent, EventType, MeetingType, Priority } from "@/application/atoms/scheduleAtom";
+import { EventType, MeetingType, Priority } from "@/application/atoms/scheduleAtom";
 import { Button } from "@/presentation/components/ui/button";
+import { createEvent } from "@/application/services/schedule";
 
 interface EventFormProps {
   onClose: () => void;
+  onEventCreated: () => void;
 }
 
-export const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
-  const [, addEvent] = useAtom(addEventAtom);
+export const EventForm: React.FC<EventFormProps> = ({ onClose, onEventCreated }) => {
+  // const [, addEvent] = useAtom(addEventAtom); // Removed atom
   const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
@@ -35,7 +36,7 @@ export const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
     };
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.title || !formData.startTime || !formData.endTime) {
@@ -43,21 +44,22 @@ export const EventForm: React.FC<EventFormProps> = ({ onClose }) => {
       return;
     }
 
-    const newEvent: Omit<ScheduleEvent, "id"> = {
-      title: formData.title,
-      description: formData.description || undefined,
-      startTime: formData.startTime,
-      endTime: formData.endTime,
-      type: formData.type,
-      meetingType: formData.meetingType,
-      location: formData.location || undefined,
-      attendees: formData.attendees ? formData.attendees.split(",").map(a => a.trim()) : undefined,
-      priority: formData.priority,
-      isRecurring: formData.isRecurring
-    };
-
-    addEvent(newEvent);
-    onClose();
+    try {
+      await createEvent({
+        summary: formData.title,
+        description: formData.description,
+        start: { dateTime: new Date(formData.startTime).toISOString(), timeZone: 'UTC' },
+        end: { dateTime: new Date(formData.endTime).toISOString(), timeZone: 'UTC' },
+        location: formData.location,
+        colorId: formData.type === 'meeting' ? '1' : '2', // Simple mapping
+        status: 'confirmed'
+      });
+      onEventCreated();
+      onClose();
+    } catch (error) {
+      console.error("Failed to create event", error);
+      alert("Failed to create event");
+    }
   };
 
   const handleChange = (field: string, value: string | boolean) => {

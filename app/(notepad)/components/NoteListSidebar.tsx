@@ -5,9 +5,6 @@ import { useAtom } from "jotai";
 import {
   notesAtom,
   activeNoteIdAtom,
-  createNewNote,
-  deleteNote,
-  updateNoteName,
 } from "@/application/atoms/notepadAtom";
 import { Button } from "@/presentation/components/ui/button";
 import { ScrollArea } from "@/presentation/components/ui/scroll-area";
@@ -15,6 +12,7 @@ import { Input } from "@/presentation/components/ui/input";
 import { cn } from "@/infrastructure/lib/utils";
 import { Trash2, FilePlus, Pencil } from "lucide-react";
 import { playSound } from "@/infrastructure/lib/utils";
+import { createNote, deleteNote, saveNote } from "@/application/services/notepad"; // Use src/ path
 
 // Constants for resizing
 const MIN_WIDTH = 150; // Minimum sidebar width in pixels
@@ -30,19 +28,6 @@ export const NoteListSidebar = () => {
   const sidebarRef = useRef<HTMLDivElement>(null);
   const [sidebarWidth, setSidebarWidth] = useState(DEFAULT_WIDTH);
   const [isResizing, setIsResizing] = useState(false);
-
-  // Load saved width from local storage (optional, can be added later)
-  // useEffect(() => {
-  //   const savedWidth = localStorage.getItem("notepadSidebarWidth");
-  //   if (savedWidth) {
-  //     setSidebarWidth(parseInt(savedWidth, 10));
-  //   }
-  // }, []);
-
-  // Save width to local storage (optional)
-  // useEffect(() => {
-  //   localStorage.setItem("notepadSidebarWidth", sidebarWidth.toString());
-  // }, [sidebarWidth]);
 
   useEffect(() => {
     if (editingNoteId && inputRef.current) {
@@ -70,12 +55,7 @@ export const NoteListSidebar = () => {
 
       const currentX = e.clientX;
       const sidebarRect = sidebarRef.current.getBoundingClientRect();
-      // Calculate new width relative to the sidebar's left edge
-      let newWidth = currentX - sidebarRect.left;
-
-      // Clamp the width within min/max bounds
-      newWidth = Math.max(MIN_WIDTH, Math.min(newWidth, MAX_WIDTH));
-
+      const newWidth = Math.max(MIN_WIDTH, Math.min(currentX - sidebarRect.left, MAX_WIDTH));
       setSidebarWidth(newWidth);
     },
     [isResizing]
@@ -98,14 +78,35 @@ export const NoteListSidebar = () => {
     };
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
-  const handleCreateNote = () => {
+  const handleCreateNote = async () => {
     playSound("/sounds/click.mp3");
-    const newNoteId = createNewNote(setNotes, setActiveNoteId);
-    setEditingNoteId(newNoteId);
+    // Optimistic creation
+    const tempId = `temp-${Date.now()}`;
+    const newNote = {
+      id: tempId,
+      name: "New Note",
+      content: '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}',
+      lastModified: Date.now()
+    };
+
+    setNotes(prev => [newNote, ...prev]);
+    setActiveNoteId(tempId);
+    setEditingNoteId(tempId);
     setEditedName("New Note");
+
+    try {
+      const created = await createNote("New Note", newNote.content);
+      // Update temporary note with real one
+      setNotes(prev => prev.map(n => n.id === tempId ? { ...n, id: created.id } : n));
+      setActiveNoteId(created.id);
+      setEditingNoteId(created.id); // Keep editing if we were editing temp
+    } catch (e) {
+      console.error("Failed to create note", e);
+      setNotes(prev => prev.filter(n => n.id !== tempId)); // Revert
+    }
   };
 
-  const handleDeleteNote = (
+  const handleDeleteNote = async (
     noteId: string,
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
@@ -114,14 +115,24 @@ export const NoteListSidebar = () => {
     if (editingNoteId === noteId) {
       setEditingNoteId(null);
     }
-    if (
-      window.confirm(
-        `Are you sure you want to delete "${
-          notes.find((n) => n.id === noteId)?.name ?? "this note"
-        }"?`
-      )
-    ) {
-      deleteNote(setNotes, setActiveNoteId, noteId);
+    const noteName = notes.find((n) => n.id === noteId)?.name ?? "this note";
+
+    if (window.confirm(`Are you sure you want to delete "${noteName}"?`)) {
+      const deletedNoteIndex = notes.findIndex(n => n.id === noteId);
+      setNotes(prev => prev.filter(n => n.id !== noteId));
+
+      if (activeNoteId === noteId) {
+        const nextNote = notes[deletedNoteIndex + 1] || notes[deletedNoteIndex - 1];
+        setActiveNoteId(nextNote ? nextNote.id : null);
+      }
+
+      try {
+        await deleteNote(noteId);
+      } catch (e) {
+        console.error("Failed to delete note", e);
+        // Could revert here by re-fetching or re-adding
+        // For now assume success or reload page to fix sync
+      }
     }
   };
 
@@ -129,10 +140,19 @@ export const NoteListSidebar = () => {
     setEditedName(event.target.value);
   };
 
-  const handleSaveName = (noteId: string) => {
-    if (editingNoteId === noteId && editedName.trim() !== "") {
-      playSound("/sounds/click.mp3");
-      updateNoteName(setNotes, noteId, editedName.trim());
+  const handleSaveName = async (noteId: string) => {
+    if (editingNoteId === noteId) {
+      const nameToSave = editedName.trim() || "Untitled Note";
+      if (nameToSave !== "") {
+        playSound("/sounds/click.mp3");
+        setNotes(prev => prev.map(n => n.id === noteId ? { ...n, name: nameToSave, lastModified: Date.now() } : n));
+
+        try {
+          await saveNote(noteId, { title: nameToSave });
+        } catch (e) {
+          console.error("Failed to update note title", e);
+        }
+      }
     }
     setEditingNoteId(null);
   };
@@ -171,7 +191,7 @@ export const NoteListSidebar = () => {
     <div
       ref={sidebarRef}
       className="relative border-r border-gray-200 bg-gray-50 flex flex-col h-full overflow-hidden"
-      style={{ width: `${sidebarWidth}px`, flexShrink: 0 }} // Apply dynamic width and prevent shrinking
+      style={{ width: `${sidebarWidth}px`, flexShrink: 0 }}
     >
       {/* Resize Handle */}
       <div
@@ -192,7 +212,6 @@ export const NoteListSidebar = () => {
         </Button>
       </div>
 
-      {/* Improved ScrollArea with proper constraints */}
       <div className="flex-grow overflow-hidden">
         <ScrollArea className="h-full w-full">
           <div className="p-2">
@@ -251,15 +270,12 @@ export const NoteListSidebar = () => {
                           </>
                         )}
                       </div>
-                      {/* Action Buttons Container */}
                       <div className="flex flex-shrink-0 items-center space-x-1 opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
-                        {/* Edit Button */}
                         <Button
                           variant="ghost"
                           size="icon"
                           className={cn(
                             "h-6 w-6 p-0 text-gray-600 hover:bg-gray-200",
-                            // Make edit button visible if focused or active
                             activeNoteId === note.id && "opacity-100"
                           )}
                           onClick={(e) =>
@@ -269,13 +285,11 @@ export const NoteListSidebar = () => {
                         >
                           <Pencil className="h-4 w-4" />
                         </Button>
-                        {/* Delete Button */}
                         <Button
                           variant="ghost"
                           size="icon"
                           className={cn(
                             "h-6 w-6 p-0 text-red-500 hover:bg-red-100",
-                            // Make delete button visible if focused or active
                             activeNoteId === note.id && "opacity-100"
                           )}
                           onClick={(e) => handleDeleteNote(note.id, e)}

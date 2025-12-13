@@ -2,7 +2,7 @@ import React from "react";
 import { formatDurationFromMinutes } from "@/app/(session-log)/sessionLogUtils"; // Assuming this utility is needed and path is correct
 import { ChartColumnIncreasing } from "lucide-react";
 import { Button } from "@/presentation/components/ui/button";
-import { appRegistry } from "@/infrastructure/config/appRegistry";
+import { appMetadata } from "@/infrastructure/config/appMetadata";
 import { openWindowAtom } from "@/application/atoms/windowAtoms";
 import { useSetAtom } from "jotai";
 import { playSound } from "@/infrastructure/lib/utils";
@@ -26,14 +26,18 @@ export const ActivitySummary: React.FC<ActivitySummaryProps> = ({
 
   const handleOpenSessionLog = () => {
     playSound("/sounds/click.mp3", "button-click");
-    const appConfig = appRegistry.sessionLog;
-    if (appConfig) {
+    // Use metadata for basic info. Default size must be hardcoded or retrieved from a separate config if needed.
+    // For now, hardcoding or using metadata if we add size there.
+    // appRegistry.sessionLog had defaultSize: { width: 700, height: 500 }, minSize: { width: 450, height: 300 }
+
+    const meta = appMetadata.sessionLog;
+    if (meta) {
       openWindow({
         id: "sessionLog",
         appId: "sessionLog",
-        title: appConfig.name,
-        initialSize: appConfig.defaultSize,
-        minSize: appConfig.minSize,
+        title: meta.name,
+        initialSize: { width: 700, height: 500 }, // Hardcoded to avoid circular dep on appRegistry
+        minSize: { width: 450, height: 300 },
       });
     }
   };

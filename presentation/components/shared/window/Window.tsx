@@ -84,7 +84,9 @@ export const Window = () => {
         // Find app configuration
         const appConfig = appRegistry[window.appId];
         if (!appConfig) {
-          console.error(`App config not found for appId: ${window.appId}`);
+          console.warn(`App config not found for appId: ${window.appId}. Auto-closing.`);
+          // Schedule a close to clean up state (wrapped in setTimeout to avoid update-during-render)
+          setTimeout(() => handleCloseWindow(window.id), 0);
           return null;
         }
 

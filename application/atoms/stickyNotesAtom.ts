@@ -12,37 +12,37 @@ export interface StickyNote {
   y: number; // px relative to canvas top
   z: number; // stacking order
   createdAt: string; // ISO
-  // optional smart fields
   category?: "quick" | "daily" | "weekly" | "longTerm";
-  expiresAt?: string | null; // ISO when note should auto-expire
-  // sizing and visuals
-  width?: number; // px
-  height?: number; // px
-  rotationDeg?: number; // small tilt
-  pinned?: boolean; // visually pinned
-  locked?: boolean; // prevent drag/resize
-  // reminders
-  reminderAt?: string | null; // ISO
+  expiresAt?: string | null;
+  pinned?: boolean;
+  locked?: boolean;
+  width?: number;
+  height?: number;
+  rotationDeg?: number;
 }
 
-export const stickyNotesAtom = atomWithStorage<StickyNote[]>("wfcos-sticky-notes", []);
+// Atom for the list of sticky notes (initialized empty, populated by component)
+export const stickyNotesAtom = atom<StickyNote[]>([]);
 
-export const addStickyNoteAtom = atom(null, (get, set, note: Omit<StickyNote, "id" | "z" | "createdAt" | "expiresAt" | "reminderAt"> & { expiresInMs?: number }) => {
+// Atom for local storage persistence (Guest Mode)
+export const localStickyNotesAtom = atomWithStorage<StickyNote[]>("sticky-notes-local", []);
+
+// Helper atoms for local state updates (no persistence side effects)
+// Note: Component passes expiresInMs, we convert to expiresAt
+export const addStickyNoteAtom = atom(null, (get, set, note: Partial<StickyNote> & { title: string, content: string, color: StickyNoteColor, x: number, y: number, expiresInMs?: number }) => {
   const existing = get(stickyNotesAtom);
-  const maxZ = existing.reduce((m, n) => Math.max(m, n.z), 0);
+  const maxZ = existing.reduce((m, n) => Math.max(m, n.z), 0) + 1;
+
+  const { expiresInMs, ...rest } = note;
+  const expiresAt = expiresInMs ? new Date(Date.now() + expiresInMs).toISOString() : rest.expiresAt;
+
   const newNote: StickyNote = {
-    id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    z: maxZ + 1,
+    id: crypto.randomUUID(),
+    z: maxZ,
     createdAt: new Date().toISOString(),
-    width: note.width ?? 176,
-    height: note.height ?? 140,
-    rotationDeg: note.rotationDeg ?? (Math.random() * 5 - 2.5),
-    pinned: note.pinned ?? false,
-    locked: note.locked ?? false,
-    reminderAt: null,
-    ...note,
-    expiresAt: typeof note.expiresInMs === "number" ? new Date(Date.now() + note.expiresInMs).toISOString() : null,
-  };
+    expiresAt,
+    ...rest
+  } as StickyNote;
   set(stickyNotesAtom, [...existing, newNote]);
 });
 
@@ -70,37 +70,34 @@ export const bringNoteToFrontAtom = atom(null, (get, set, id: string) => {
 
 export const sendNoteToBackAtom = atom(null, (get, set, id: string) => {
   const notes = get(stickyNotesAtom);
-  const minZ = notes.reduce((m, n) => Math.min(m, n.z), Infinity) - 1;
+  const minZ = notes.reduce((m, n) => Math.min(m, n.z), 0) - 1;
   set(
     stickyNotesAtom,
     notes.map((n) => (n.id === id ? { ...n, z: minZ } : n))
   );
 });
 
-// Prune expired notes helper
 export const pruneExpiredNotesAtom = atom(null, (get, set) => {
-  const now = Date.now();
   const notes = get(stickyNotesAtom);
-  const filtered = notes.filter((n) => !n.expiresAt || new Date(n.expiresAt).getTime() > now);
-  if (filtered.length !== notes.length) {
-    set(stickyNotesAtom, filtered);
+  const now = new Date().toISOString();
+  const active = notes.filter(n => !n.expiresAt || n.expiresAt > now);
+  if (active.length !== notes.length) {
+    set(stickyNotesAtom, active);
   }
 });
 
 export const duplicateNoteAtom = atom(null, (get, set, id: string) => {
   const notes = get(stickyNotesAtom);
-  const src = notes.find((n) => n.id === id);
-  if (!src) return;
-  const maxZ = notes.reduce((m, n) => Math.max(m, n.z), 0);
-  const copy: StickyNote = {
-    ...src,
-    id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-    x: src.x + 20,
-    y: src.y + 20,
-    z: maxZ + 1,
-    createdAt: new Date().toISOString(),
+  const note = notes.find(n => n.id === id);
+  if (!note) return;
+  const maxZ = notes.reduce((m, n) => Math.max(m, n.z), 0) + 1;
+  const newNote = {
+    ...note,
+    id: crypto.randomUUID(),
+    x: note.x + 20,
+    y: note.y + 20,
+    z: maxZ,
+    createdAt: new Date().toISOString()
   };
-  set(stickyNotesAtom, [...notes, copy]);
+  set(stickyNotesAtom, [...notes, newNote]);
 });
-
-

@@ -26,7 +26,6 @@ import { playSound } from "@/infrastructure/lib/utils";
 import {
   notesAtom,
   activeNoteIdAtom,
-  createNewNote,
   saveActiveNoteAtom,
   activeNoteContentAtom,
 } from "@/application/atoms/notepadAtom";
@@ -34,6 +33,7 @@ import { NoteListSidebar } from "./components/NoteListSidebar";
 import { RichTextToolbar } from "./components/RichTextToolbar";
 import { useDebouncedCallback } from "use-debounce";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
+import { getNotes, saveNote } from "@/application/services/notepad"; // Use src path
 
 const editorTheme = {
   ltr: "ltr",
@@ -150,7 +150,7 @@ const Notepad: React.FC = () => {
   const [activeNoteId, setActiveNoteId] = useAtom(activeNoteIdAtom);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const setNotes = useSetAtom(notesAtom);
-  const saveNote = useSetAtom(saveActiveNoteAtom);
+  const saveNoteLocal = useSetAtom(saveActiveNoteAtom);
   const activeNoteContent = useAtomValue(activeNoteContentAtom);
 
   const isMounted = useRef<boolean>(false);
@@ -163,32 +163,36 @@ const Notepad: React.FC = () => {
     };
   }, []);
 
+  // Fetch notes on mount
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const serverNotes = await getNotes();
+        const mappedNotes = serverNotes.map(n => ({
+          id: n.id,
+          name: n.title,
+          content: n.content || '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}',
+          lastModified: new Date(n.updatedAt).getTime()
+        }));
+        setNotes(mappedNotes);
+
+        if (mappedNotes.length > 0 && !activeNoteId) {
+          setActiveNoteId(mappedNotes[0].id);
+        }
+      } catch (error) {
+        console.error("Failed to fetch notes", error);
+      }
+    };
+    fetchNotes();
+  }, []);
+
   useEffect(() => {
     currentActiveNoteId.current = activeNoteId;
   }, [activeNoteId]);
 
-  useEffect(() => {
-    if (notes.length === 0 && isMounted.current) {
-      console.log("No notes found, creating initial note.");
-      createNewNote(setNotes, setActiveNoteId);
-    } else if (!activeNoteId && notes.length > 0 && isMounted.current) {
-      console.log("No active note ID, selecting first note.");
-      setActiveNoteId(notes[0].id);
-    } else if (
-      activeNoteId &&
-      !notes.some((n) => n.id === activeNoteId) &&
-      notes.length > 0 &&
-      isMounted.current
-    ) {
-      console.warn(
-        "Active note ID not found in notes list, selecting first note."
-      );
-      setActiveNoteId(notes[0].id);
-    }
-  }, [notes, activeNoteId, setActiveNoteId, setNotes]);
 
   const debouncedSave = useDebouncedCallback(
-    (
+    async (
       noteIdToSave: string | null,
       newEditorState: EditorState,
       editor: LexicalEditor
@@ -201,12 +205,19 @@ const Notepad: React.FC = () => {
       const contentAtChangeTime = noteAtChangeTime?.content;
 
       if (stateString === contentAtChangeTime) {
-        // console.log(`Note ${noteIdToSave}: Content hasn't changed, skipping save.`); // Optional: uncomment for debugging
         return;
       }
 
       console.log("Saving note:", noteIdToSave);
-      saveNote({ noteId: noteIdToSave, content: stateString, editor });
+      // Perform local update (optimistic)
+      saveNoteLocal({ noteId: noteIdToSave, content: stateString, editor });
+
+      // Perform server update
+      try {
+        await saveNote(noteIdToSave, { content: stateString });
+      } catch (error) {
+        console.error("Failed to save note to server", error);
+      }
     },
     1000
   );

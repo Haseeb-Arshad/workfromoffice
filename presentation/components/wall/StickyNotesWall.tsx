@@ -149,7 +149,8 @@ export const StickyNotesWall: React.FC = () => {
             aria-hidden
         >
             {/* subtle wall texture */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.25),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.18),transparent_28%)]" />
+            {/* subtle wall texture - reduced opacity */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.05),transparent_30%),radial-gradient(circle_at_80%_10%,rgba(255,255,255,0.03),transparent_28%)]" />
 
             {/* notes */}
             {notes.map((note) => (

@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useAtom } from "jotai";
-import { eventsAtom } from "@/application/atoms/scheduleAtom";
+// import { useAtom } from "jotai";
+// import { eventsAtom } from "@/application/atoms/scheduleAtom"; // Removed duplicate
 import { EventCard } from "./components/EventCard";
 import { EventForm } from "./components/EventForm";
 // Import mockCalendarEvents for now, Google Calendar service will be server-side
@@ -44,14 +44,42 @@ import { Plus, Calendar, Clock, Settings } from "lucide-react";
 import { CalendarIntegration } from "./components/CalendarIntegration";
 import { Button } from "@/presentation/components/ui/button";
 
+import { getEvents } from "@/application/services/schedule";
+import { ScheduleEvent } from "@/application/atoms/scheduleAtom"; // Keep types for now if compatible, or map
+
 const Schedule = () => {
-  const [events] = useAtom(eventsAtom);
+  // const [events] = useAtom(eventsAtom); // Removed atom source of truth
+  const [events, setEvents] = useState<ScheduleEvent[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [isFormAnimating, setIsFormAnimating] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showCalendarIntegration, setShowCalendarIntegration] = useState(false);
   const [googleEvents, setGoogleEvents] = useState<typeof mockCalendarEvents>([]);
   const [isCalendarConnected, setIsCalendarConnected] = useState(false);
+
+  const fetchEvents = async () => {
+    const serverEvents = await getEvents();
+    // Map server events to ScheduleEvent type expected by UI
+    // ScheduleEvent expects: id, title, description, startTime (ISO), endTime (ISO), type etc.
+    // Server returned: id, summary, description, start.dateTime...
+    const mappedEvents: ScheduleEvent[] = serverEvents.map(e => ({
+      id: e.id,
+      title: e.summary,
+      description: e.description,
+      startTime: e.start.dateTime,
+      endTime: e.end.dateTime,
+      type: "meeting", // Default or stored in DB property? we didn't store 'type' in DB schema explicitly besides calendar_events fields. 
+      // Schema had: color_id, location. We can map color_id to type if we want or add type column to schema. 
+      // For now default to 'meeting'
+      meetingType: "virtual",
+      priority: "medium"
+    }));
+    setEvents(mappedEvents);
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   // Update current time every minute
   useEffect(() => {
@@ -139,8 +167,8 @@ const Schedule = () => {
               <Button
                 onClick={() => setShowCalendarIntegration(!showCalendarIntegration)}
                 className={`flex items-center gap-2 rounded-md border px-3 py-2 text-xs font-medium ${isCalendarConnected
-                    ? "bg-emerald-500 text-white hover:bg-emerald-600"
-                    : "bg-white text-secondary border-primary/15 hover:bg-white"
+                  ? "bg-emerald-500 text-white hover:bg-emerald-600"
+                  : "bg-white text-secondary border-primary/15 hover:bg-white"
                   }`}
               >
                 <Settings className={`w-4 h-4 ${isCalendarConnected ? "text-white" : "text-secondary"}`} />
@@ -183,10 +211,13 @@ const Schedule = () => {
 
       {/* Add Event Form */}
       {showForm && (
-        <EventForm onClose={() => {
-          setShowForm(false);
-          setIsFormAnimating(false);
-        }} />
+        <EventForm
+          onClose={() => {
+            setShowForm(false);
+            setIsFormAnimating(false);
+          }}
+          onEventCreated={fetchEvents}
+        />
       )}
 
       {/* Daily Overview */}

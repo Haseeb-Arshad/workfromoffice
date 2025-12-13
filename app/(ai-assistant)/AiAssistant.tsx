@@ -1,10 +1,10 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, Minimize2, AlertCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/presentation/components/ui/button";
 import { aiApi } from "@/infrastructure/lib/api";
+import { saveChatMessage, getChatHistory, clearChatHistory } from "@/application/services/sessions"; // Use src path
 
 interface Message {
   id: string;
@@ -23,7 +23,7 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
     {
       id: "welcome",
       role: "assistant",
-      content: "Hello! I'm your AI Assistant, here to help you with tasks, answer questions, and boost your productivity in WorkBase. How can I assist you today?",
+      content: "Hello! I'm your AI Assistant. How can I assist you today?",
       timestamp: new Date(),
     },
   ]);
@@ -32,46 +32,84 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
   const [error, setError] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const isHistoryLoaded = useRef(false);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  // Generate session ID on component mount
+  // Load or generate session ID and fetch history
   useEffect(() => {
-    const newSessionId = `workbase-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    setSessionId(newSessionId);
+    const storedSessionId = localStorage.getItem("workbase_chat_session_id");
+    let currentSessionId = storedSessionId;
+
+    if (!currentSessionId) {
+      currentSessionId = `workbase-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem("workbase_chat_session_id", currentSessionId);
+    }
+    setSessionId(currentSessionId);
+
+    // Fetch history
+    const fetchHistory = async () => {
+      try {
+        const history = await getChatHistory(currentSessionId!);
+        if (history.length > 0) {
+          setMessages(history.map(m => ({
+            id: m.id,
+            role: m.role,
+            content: m.content,
+            timestamp: m.timestamp
+          })));
+        }
+      } catch (e) {
+        console.error("Failed to fetch chat history", e);
+      } finally {
+        isHistoryLoaded.current = true;
+      }
+    };
+    fetchHistory();
   }, []);
 
   useEffect(() => {
-    scrollToBottom();
+    if (isHistoryLoaded.current) {
+      scrollToBottom();
+    }
   }, [messages]);
 
   const handleSendMessage = async () => {
     if (!input.trim() || !sessionId) return;
 
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: input,
-      timestamp: new Date(),
-    };
-
-    setMessages(prev => [...prev, userMessage]);
-    const messageContent = input;
+    const content = input;
     setInput("");
     setIsLoading(true);
     setError(null);
 
+    // Optimistic user message
+    const tempUserMsgId = Date.now().toString();
+    const userMessage: Message = {
+      id: tempUserMsgId,
+      role: "user",
+      content,
+      timestamp: new Date(),
+    };
+    setMessages(prev => [...prev, userMessage]);
+
     try {
+      // Save User Message
+      await saveChatMessage(sessionId, { role: "user", content });
+
       // Call backend API
-      const response = await aiApi.chat(messageContent, sessionId);
+      const response = await aiApi.chat(content, sessionId);
+      const aiContent = response.data.message;
+
+      // Save Assistant Message
+      const savedAiMsg = await saveChatMessage(sessionId, { role: "assistant", content: aiContent });
 
       const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
+        id: savedAiMsg.id,
         role: "assistant",
-        content: response.data.message,
-        timestamp: new Date(),
+        content: aiContent,
+        timestamp: savedAiMsg.timestamp,
       };
 
       setMessages(prev => [...prev, aiResponse]);
@@ -79,14 +117,12 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
       console.error('AI Chat Error:', error);
       setError(error instanceof Error ? error.message : 'Failed to get AI response');
 
-      // Add error message to chat
       const errorMessage: Message = {
         id: (Date.now() + 2).toString(),
         role: "assistant",
-        content: "I'm sorry, I'm having trouble connecting to my AI service right now. Please make sure the backend server is running and try again.",
+        content: "I'm sorry, I'm having trouble connecting to my services using persistence right now.",
         timestamp: new Date(),
       };
-
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -97,7 +133,9 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
     if (!sessionId) return;
 
     try {
-      await aiApi.clearConversation(sessionId);
+      await aiApi.clearConversation(sessionId); // Clear on server memory if needed
+      await clearChatHistory(sessionId); // Clear in DB
+
       setMessages([
         {
           id: "welcome-new",
@@ -205,8 +243,8 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
 
             <div
               className={`max-w-[75%] px-3 py-2.5 rounded-xl text-sm ${message.role === "user"
-                  ? "bg-gradient-to-br from-secondary to-accent text-white shadow-sm"
-                  : "bg-white/70 backdrop-blur-sm border border-primary/10 text-primary"
+                ? "bg-gradient-to-br from-secondary to-accent text-white shadow-sm"
+                : "bg-white/70 backdrop-blur-sm border border-primary/10 text-primary"
                 }`}
             >
               <p className="leading-relaxed whitespace-pre-wrap">

@@ -1,24 +1,25 @@
 "use client";
 
 import React from "react";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import {
-  deleteSessionAtom,
+  sessionsAtom,
   sortedSessionsAtom,
 } from "@/application/atoms/sessionAtoms";
 import { tasksAtom } from "@/application/atoms/todoListAtom";
-import { SessionLogTable } from "./SessionLogTable"; // Assuming SessionLogTable.tsx is in the same directory
+import { SessionLogTable } from "./SessionLogTable";
 import { Button } from "@/presentation/components/ui/button";
 import { ChevronLeft } from "lucide-react";
 import { ChevronRight } from "lucide-react";
 import { playSound } from "@/infrastructure/lib/utils";
+import { deleteSession as deleteSessionServer } from "@/application/services/sessions";
 
 const ITEMS_PER_PAGE = 10;
 
 export const TableSection = () => {
   const sessions = useAtomValue(sortedSessionsAtom);
+  const setSessions = useSetAtom(sessionsAtom);
   const allTasks = useAtomValue(tasksAtom);
-  const [, deleteSession] = useAtom(deleteSessionAtom);
   const [currentPage, setCurrentPage] = React.useState(1);
 
   const handleInteractionSound = () => {
@@ -41,12 +42,28 @@ export const TableSection = () => {
     handleInteractionSound();
   };
 
+  const handleDeleteSession = async (id: string) => {
+    // Optimistic update
+    const sessionToDelete = sessions.find(s => s.id === id);
+    setSessions(prev => prev.filter(s => s.id !== id));
+
+    try {
+      await deleteSessionServer(id);
+    } catch (e) {
+      console.error("Failed to delete session", e);
+      // Revert
+      if (sessionToDelete) {
+        setSessions(prev => [...prev, sessionToDelete]);
+      }
+    }
+  };
+
   return (
     <>
       <SessionLogTable
         sessions={paginatedSessions}
         allTasks={allTasks}
-        deleteSession={deleteSession}
+        deleteSession={handleDeleteSession}
       />
       {sessions.length > ITEMS_PER_PAGE && (
         <div className="mt-4 flex justify-center items-center space-x-2">
