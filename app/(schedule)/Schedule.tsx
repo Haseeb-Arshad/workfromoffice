@@ -45,6 +45,7 @@ import { CalendarIntegration } from "./components/CalendarIntegration";
 import { Button } from "@/presentation/components/ui/button";
 
 import { getEvents } from "@/application/services/schedule";
+import { checkGoogleConnected, fetchGoogleCalendarEvents } from "@/application/services/googleCalendar";
 import { ScheduleEvent } from "@/application/atoms/scheduleAtom"; // Keep types for now if compatible, or map
 
 const Schedule = () => {
@@ -75,6 +76,30 @@ const Schedule = () => {
       priority: "medium"
     }));
     setEvents(mappedEvents);
+
+    // Also fetch Google events if connected
+    const isConnected = await checkGoogleConnected();
+    setIsCalendarConnected(isConnected);
+
+    if (isConnected) {
+      try {
+        const gEvents = await fetchGoogleCalendarEvents();
+        // Map google events to UI format
+        const mappedGEvents: any[] = gEvents.map((e: any) => ({
+          id: e.id,
+          summary: e.summary,
+          description: e.description,
+          start: { dateTime: e.start.dateTime || e.start.date, timeZone: e.start.timeZone },
+          end: { dateTime: e.end.dateTime || e.end.date, timeZone: e.end.timeZone },
+          location: e.location,
+          colorId: 'google',
+          status: e.status
+        }));
+        setGoogleEvents(mappedGEvents);
+      } catch (e) {
+        console.error("Failed to fetch google events", e);
+      }
+    }
   };
 
   useEffect(() => {
@@ -89,13 +114,9 @@ const Schedule = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Load Google Calendar events (mock for now)
+  // Load Google Calendar events
   useEffect(() => {
-    // For demo purposes, use mock data
-    // In production, this would check authentication and fetch real events
-    if (isCalendarConnected) {
-      setGoogleEvents(mockCalendarEvents);
-    }
+    // Logic moved to fetchEvents to centralize async calls and check connection on load
   }, [isCalendarConnected]);
 
   const today = new Date();

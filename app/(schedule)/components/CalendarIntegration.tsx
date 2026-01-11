@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { X, Calendar, Settings, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/presentation/components/ui/button";
+import { getGoogleAuthUrl } from "@/application/services/googleCalendar";
 
 interface CalendarIntegrationProps {
   onClose: () => void;
@@ -19,12 +20,13 @@ export const CalendarIntegration: React.FC<CalendarIntegrationProps> = ({
 
   const handleConnect = async () => {
     setIsConnecting(true);
-    
-    // Simulate connection process
-    setTimeout(() => {
-      onConnectionChange(true);
+    try {
+      const url = await getGoogleAuthUrl();
+      window.location.href = url;
+    } catch (error) {
+      console.error("Failed to get auth url", error);
       setIsConnecting(false);
-    }, 2000);
+    }
   };
 
   const handleDisconnect = () => {

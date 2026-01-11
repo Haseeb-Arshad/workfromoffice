@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Send, Bot, User, Minimize2, AlertCircle, RotateCcw } from "lucide-react";
 import { Button } from "@/presentation/components/ui/button";
-import { aiApi } from "@/infrastructure/lib/api";
-import { saveChatMessage, getChatHistory, clearChatHistory } from "@/application/services/sessions"; // Use src path
+import { chatWithAI } from "@/application/services/ai";
+import { getChatHistory, clearChatHistory } from "@/application/services/sessions"; // Use src path
 
 interface Message {
   id: string;
@@ -95,21 +95,20 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
     setMessages(prev => [...prev, userMessage]);
 
     try {
-      // Save User Message
-      await saveChatMessage(sessionId, { role: "user", content });
+      // Call server action
+      const response = await chatWithAI(content, sessionId);
 
-      // Call backend API
-      const response = await aiApi.chat(content, sessionId);
+      if (!response.success) {
+        throw new Error(response.error);
+      }
+
       const aiContent = response.data.message;
 
-      // Save Assistant Message
-      const savedAiMsg = await saveChatMessage(sessionId, { role: "assistant", content: aiContent });
-
       const aiResponse: Message = {
-        id: savedAiMsg.id,
+        id: Date.now().toString(), // We'll use temp ID for UI, refresh on next load gets real one
         role: "assistant",
         content: aiContent,
-        timestamp: savedAiMsg.timestamp,
+        timestamp: new Date(),
       };
 
       setMessages(prev => [...prev, aiResponse]);
@@ -133,7 +132,6 @@ const AiAssistant: React.FC<AiAssistantProps> = ({ isMinimized = false, onToggle
     if (!sessionId) return;
 
     try {
-      await aiApi.clearConversation(sessionId); // Clear on server memory if needed
       await clearChatHistory(sessionId); // Clear in DB
 
       setMessages([
