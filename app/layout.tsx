@@ -4,6 +4,7 @@ import "@/presentation/styles/globals.css";
 import JotaiProvider from "@/providers/JotaiProvider";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import StickyNotesWall from "@/presentation/components/wall/StickyNotesWall";
+import { CommandBar } from "@/presentation/components/shared/CommandBar";
 
 const font = Itim({ weight: "400", subsets: ["latin"] });
 
@@ -50,6 +51,7 @@ export default function RootLayout({
         <JotaiProvider>
           {/* Background wall elements */}
           <StickyNotesWall />
+          <CommandBar />
           {children}
         </JotaiProvider>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
