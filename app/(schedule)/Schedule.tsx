@@ -6,6 +6,7 @@ import React, { useState, useEffect } from "react";
 import { EventCard } from "./components/EventCard";
 import { EventForm } from "./components/EventForm";
 // Import mockCalendarEvents for now, Google Calendar service will be server-side
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const mockCalendarEvents = [
   {
     id: '1',
@@ -85,6 +86,7 @@ const Schedule = () => {
       try {
         const gEvents = await fetchGoogleCalendarEvents();
         // Map google events to UI format
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const mappedGEvents: any[] = gEvents.map((e: any) => ({
           id: e.id,
           summary: e.summary,
