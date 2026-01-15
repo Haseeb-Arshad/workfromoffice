@@ -1,17 +1,29 @@
 'use server'
 
-import { OpenAI } from 'openai'
-import { getChatHistory, saveChatMessage } from './sessions'
+// import { OpenAI } from 'openai' // dynamic import used
+import { getChatHistory, saveChatMessage } from './chat'
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-})
+const getOpenAIClient = async () => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+        console.warn('OpenAI API Key is missing');
+    }
+    const { OpenAI } = await import('openai');
+    return new OpenAI({
+        apiKey: apiKey || 'dummy-key-for-build',
+        dangerouslyAllowBrowser: true
+    });
+}
+
+// const openai = new OpenAI({ ... }) // Removed top level
 
 const DEFAULT_MODEL = 'gpt-4o'
 const SYSTEM_PROMPT = 'You are a helpful AI assistant for WorkBase, a productivity workspace application. You help users with task management, productivity tips, time management, and work-related questions. Be professional, concise, and helpful. Focus on actionable advice and practical solutions.'
 
 export async function chatWithAI(message: string, sessionId: string) {
     try {
+        const openai = await getOpenAIClient();
+
         // 1. Get history from Supabase
         const history = await getChatHistory(sessionId)
 
@@ -68,6 +80,7 @@ export async function generateAITaskSuggestions(taskDescription: string) {
     try {
         const prompt = `Based on this task: "${taskDescription}", suggest 3-5 actionable subtasks to accomplish it. Format as a numbered list.`;
 
+        const openai = await getOpenAIClient();
         const completion = await openai.chat.completions.create({
             model: process.env.OPENAI_MODEL || DEFAULT_MODEL,
             messages: [
@@ -101,6 +114,7 @@ export async function analyzeProductivityWithAI(taskData: any) {
     try {
         const prompt = `Analyze this productivity data and provide 2-3 actionable insights: ${JSON.stringify(taskData)}`;
 
+        const openai = await getOpenAIClient();
         const completion = await openai.chat.completions.create({
             model: process.env.OPENAI_MODEL || DEFAULT_MODEL,
             messages: [
